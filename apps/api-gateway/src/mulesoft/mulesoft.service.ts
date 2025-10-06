@@ -3,8 +3,55 @@ import { HttpException, Injectable } from '@nestjs/common';
 @Injectable()
 export class MulesoftService {
 
-  getMulesoftCustomer() {
-    return `This action returns all mulesoft`;
+  async getMulesoftCustomerByANI(params: any) {
+
+    const { ani } = params;
+    const url = `https://mule.telecom.com.ar/customer-mngmt-proc-api-prod/api/v1/customer?excludeNulls=true&deepLevel=3&mobileNumber=${ani}`
+    const client = "67472340-c6fc-4345-b266-d082f1cbbfd6";
+    const token = "";
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      'client_id': `${client}`,
+    };
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: headers,
+    })
+
+    if (!response.ok) {
+      const txt = await response.text();
+      throw new HttpException(txt || 'Upstream error', response.status);
+    }
+
+    return response.json();
+  }
+
+  async getMulesoftCustomerByDNI(params: any) {
+    const { dni } = params;
+    const url = `https://mule.telecom.com.ar/customer-mngmt-proc-api-prod/api/v1/customer?excludeNulls=true&deepLevel=3&documentType=dni&documentNumber=${dni}`
+    const client = "67472340-c6fc-4345-b266-d082f1cbbfd6";
+    const token = "";
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      'client_id': `${client}`,
+    };
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: headers,
+    })
+
+    if (!response.ok) {
+      const txt = await response.text();
+      throw new HttpException(txt || 'Upstream error', response.status);
+    }
+
+    return response.json();
   }
 
   async getMulesoftCancellationAccept(params: any, body: any) {

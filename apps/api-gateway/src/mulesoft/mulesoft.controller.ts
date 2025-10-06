@@ -5,9 +5,18 @@ import { MulesoftService } from './mulesoft.service';
 export class MulesoftController {
   constructor(private readonly mulesoftService: MulesoftService) { }
 
-  @Get('customer-managment')
-  getMulesoftCustomer() {
-    return this.mulesoftService.getMulesoftCustomer();
+  @Get('customer-managment-ani')
+  getMulesoftCustomerByANI(
+    @Query() params: { ani: string }
+  ) {
+    return this.mulesoftService.getMulesoftCustomerByANI(params);
+  }
+
+  @Get('customer-managment-dni')
+  getMulesoftCustomerByDNI(
+    @Query() params: { dni: string }
+  ) {
+    return this.mulesoftService.getMulesoftCustomerByDNI(params);
   }
 
   @Post('cancellation-process-accept')
