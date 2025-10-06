@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class MulesoftService {
@@ -7,8 +7,68 @@ export class MulesoftService {
     return `This action returns all mulesoft`;
   }
 
-  getMulesoftCancellation() {
-    return `This action returns all mulesoft`;
+  async getMulesoftCancellationAccept(params: any, body: any) {
+    const url = "https://mule.telecom.com.ar/cancellation-process-api-prod/api/v1/retention/accept";
+    const client = "67472340-c6fc-4345-b266-d082f1cbbfd6";
+    const token = "";
+
+    const { xcorrelationid, currentApplication, currentComponent } = params;
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      'client_id': `${client}`,
+      'x-correlation-id': `${xcorrelationid}`,
+      'currentApplication': `${currentApplication}`,
+      'currentComponent': `${currentComponent}`,
+      'sourceApplication': 'IVR',
+      'sourceComponent': 'Martech',
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      body,
+    })
+
+    if (!response.ok) {
+      const txt = await response.text();
+      throw new HttpException(txt || 'Upstream error', response.status);
+    }
+
+    return response.json;
+  }
+
+  async getMulesoftCancellationReject(params: any, body: any) {
+    const url = "https://mule.telecom.com.ar/cancellation-process-api-prod/api/v1/retention/reject";
+    const client = "67472340-c6fc-4345-b266-d082f1cbbfd6";
+    const token = "";
+
+    const { xcorrelationid, currentApplication, currentComponent } = params;
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      'client_id': `${client}`,
+      'x-correlation-id': `${xcorrelationid}`,
+      'currentApplication': `${currentApplication}`,
+      'currentComponent': `${currentComponent}`,
+      'sourceApplication': 'IVR',
+      'sourceComponent': 'Martech',
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      body,
+    })
+
+    if (!response.ok) {
+      const txt = await response.text();
+      throw new HttpException(txt || 'Upstream error', response.status);
+    }
+
+    return response.json;
   }
 
   getMulesoftCustomerBill() {

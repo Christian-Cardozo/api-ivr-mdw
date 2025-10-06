@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { MulesoftService } from './mulesoft.service';
 
 @Controller('mulesoft')
@@ -10,9 +10,20 @@ export class MulesoftController {
     return this.mulesoftService.getMulesoftCustomer();
   }
 
-  @Get('cancellation-process')
-  getMulesoftCancellation() {
-    return this.mulesoftService.getMulesoftCancellation();
+  @Post('cancellation-process-accept')
+  getMulesoftCancellationAccept(
+    @Query() params: { xcorrelationid?: string; currentapplication?: string; currentcomponent?: string },
+    @Body() body: any    
+  ) {
+    return this.mulesoftService.getMulesoftCancellationAccept(params, body);
+  }
+
+  @Get('cancellation-process-reject')
+  getMulesoftCancellationReject(
+    @Query() params: { xcorrelationid?: string; currentapplication?: string; currentcomponent?: string },
+    @Body() body: any
+  ) {
+    return this.mulesoftService.getMulesoftCancellationReject(params, body);
   }
 
   @Get('customer-bill-managment')
