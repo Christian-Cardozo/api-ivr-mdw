@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/api-gateway/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/api-gateway",
+  "projects": {
+    "api-gateway": {
+      "type": "application",
+      "root": "apps/api-gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/api-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
+      }
+    },
+    "auth-client": {
+      "type": "library",
+      "root": "libs/auth-client",
+      "entryFile": "index",
+      "sourceRoot": "libs/auth-client/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/auth-client/tsconfig.lib.json"
+      }
+    },
+    "mulesoft-customer-ms": {
+      "type": "application",
+      "root": "apps/mulesoft-customer-ms",
+      "entryFile": "main",
+      "sourceRoot": "apps/mulesoft-customer-ms/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/mulesoft-customer-ms/tsconfig.app.json"
+      }
+    }
+  }
+}
