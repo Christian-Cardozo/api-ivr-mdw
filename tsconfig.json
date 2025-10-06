@@ -33,6 +33,12 @@
       ],
       "@app/libs/*": [
         "libs/libs/src/*"
+      ],
+      "@app/redis": [
+        "libs/redis/src"
+      ],
+      "@app/redis/*": [
+        "libs/redis/src/*"
       ]
     }
   }
