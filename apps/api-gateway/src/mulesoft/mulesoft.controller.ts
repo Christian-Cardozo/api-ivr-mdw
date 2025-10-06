@@ -1,22 +1,23 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { MulesoftService } from './mulesoft.service';
 
 @Controller('mulesoft')
 export class MulesoftController {
   constructor(private readonly mulesoftService: MulesoftService) { }
 
-  @Get('customer-managment-ani')
+  @Get('customer-management-ani/:ani')
   getMulesoftCustomerByANI(
-    @Query() params: { ani: string }
+    @Param('ani') ani: string
   ) {
-    return this.mulesoftService.getMulesoftCustomerByANI(params);
+    return this.mulesoftService.getMulesoftCustomerByANI(ani);
   }
 
-  @Get('customer-managment-dni')
+  @Get('customer-management-dni/:dni')
   getMulesoftCustomerByDNI(
-    @Query() params: { dni: string }
+    @Param('dni') dni: string
+    //@Query('type', new DefaultValuePipe('dni')) type: 'dni' | 'passport' | 'cuit',
   ) {
-    return this.mulesoftService.getMulesoftCustomerByDNI(params);
+    return this.mulesoftService.getMulesoftCustomerByDNI(dni);
   }
 
   @Post('cancellation-process-accept')

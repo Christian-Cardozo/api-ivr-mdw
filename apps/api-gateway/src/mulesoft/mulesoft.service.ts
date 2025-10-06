@@ -1,14 +1,18 @@
 import { HttpException, Injectable } from '@nestjs/common';
+import { AuthClientService } from '@app/auth-client';
 
 @Injectable()
 export class MulesoftService {
 
-  async getMulesoftCustomerByANI(params: any) {
+  constructor(
+    private readonly authService: AuthClientService,
+  ) {}
 
-    const { ani } = params;
+  async getMulesoftCustomerByANI(ani:string) {
+    
     const url = `https://mule.telecom.com.ar/customer-mngmt-proc-api-prod/api/v1/customer?excludeNulls=true&deepLevel=3&mobileNumber=${ani}`
     const client = "67472340-c6fc-4345-b266-d082f1cbbfd6";
-    const token = "";
+    const token = await this.authService.getToken();
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -29,11 +33,11 @@ export class MulesoftService {
     return response.json();
   }
 
-  async getMulesoftCustomerByDNI(params: any) {
-    const { dni } = params;
-    const url = `https://mule.telecom.com.ar/customer-mngmt-proc-api-prod/api/v1/customer?excludeNulls=true&deepLevel=3&documentType=dni&documentNumber=${dni}`
+  async getMulesoftCustomerByDNI(dni:string) {
+    
+    const url = `https://mule.telecom.com.ar/customer-mngmt-proc-api-prod/api/v1/customer?excludeNulls=true&deepLevel=3&documentType=DNI&documentNumber=${dni}`
     const client = "67472340-c6fc-4345-b266-d082f1cbbfd6";
-    const token = "";
+    const token = await this.authService.getToken();;
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
