@@ -23,8 +23,10 @@
     "@keyv/redis": "^5.1.2",
     "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
     "@nestjs/mapped-types": "*",
+    "@nestjs/microservices": "^11.1.6",
     "@nestjs/platform-express": "^11.0.1",
     "cache-manager": "^7.2.3",
     "js2xmlparser": "^5.0.0",
@@ -80,6 +82,7 @@
     ],
     "moduleNameMapper": {
       "^@app/auth-client(|/.*)$": "<rootDir>/libs/auth-client/src/$1",
+      "^@app/config(|/.*)$": "<rootDir>/libs/config/src/$1",
       "^@app/redis(|/.*)$": "<rootDir>/libs/redis/src/$1",
       "^@app/xml(|/.*)$": "<rootDir>/libs/xml/src/$1"
     }

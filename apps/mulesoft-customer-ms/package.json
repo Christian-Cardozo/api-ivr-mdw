@@ -1,0 +1,9 @@
+{
+  "name": "mulesoft-customer-ms",
+  "private": true,
+  "scripts": {
+    "build": "nest build mulesoft-customer-ms",
+    "start:prod": "node dist/apps/mulesoft-customer-ms/main.js",
+    "start:dev": "nest start mulesoft-customer-ms --watch"
+  }
+}

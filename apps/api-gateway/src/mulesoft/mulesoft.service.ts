@@ -1,65 +1,26 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { AuthClientService } from '@app/auth-client';
+import { ClientProxy } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class MulesoftService {
 
   constructor(
     private readonly authService: AuthClientService,
+    @Inject('MULESOFT_CUSTOMER_MS') private readonly mulesoftClient: ClientProxy,
   ) { }
 
-  async getMulesoftCustomerByANI(ani: string) {
+  getMulesoftCustomerByANI(ani: string): Observable<string> {
 
-    const url = `https://mule.telecom.com.ar/customer-mngmt-proc-api-prod/api/v1/customer?excludeNulls=true&deepLevel=3&mobileNumber=${ani}`
-    const client = "67472340-c6fc-4345-b266-d082f1cbbfd6";
-    const token = await this.authService.getToken();
+    return this.mulesoftClient.send<string, string>('get-by-ani', ani);
 
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-      'client_id': `${client}`,
-    };
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: headers,
-    })
-
-    if (!response.ok) {
-      const txt = await response.text();
-      throw new HttpException(
-        { message: txt || 'Upstream error', statusText: response.statusText },
-        response.status,
-      );
-
-    }
-
-    return response.json();
   }
 
-  async getMulesoftCustomerByDNI(dni: string) {
+  getMulesoftCustomerByDNI(dni: string): Observable<string> {
 
-    const url = `https://mule.telecom.com.ar/customer-mngmt-proc-api-prod/api/v1/customer?excludeNulls=true&deepLevel=3&documentType=DNI&documentNumber=${dni}`
-    const client = "67472340-c6fc-4345-b266-d082f1cbbfd6";
-    const token = await this.authService.getToken();;
+    return this.mulesoftClient.send<string, string>('get-by-dni', dni);
 
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-      'client_id': `${client}`,
-    };
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: headers,
-    })
-
-    if (!response.ok) {
-      const txt = await response.text();
-      throw new HttpException(txt || 'Upstream error', response.status);
-    }
-
-    return response.json();
   }
 
   async getMulesoftCancellationAccept(params: any, body: any) {

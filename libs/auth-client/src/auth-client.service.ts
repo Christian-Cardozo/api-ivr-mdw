@@ -2,12 +2,16 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { IDPResponse } from './interfaces/idp-response.interface';
 import type { Cache } from 'cache-manager';
+import { ConfigService } from '@nestjs/config';
 
 
 @Injectable()
 export class AuthClientService {
 
-    constructor(@Inject(CACHE_MANAGER) private cache: Cache) { }
+    constructor(
+        @Inject(CACHE_MANAGER) private cache: Cache,
+        private readonly configService: ConfigService,
+    ) { }
 
     async getToken(): Promise<string> {
        
@@ -26,8 +30,8 @@ export class AuthClientService {
 
     async fetchToken(): Promise<IDPResponse> {
 
-        const url = 'https://idpsesion.telecom.com.ar/openam/oauth2/access_token?realm=/convergente&grant_type=client_credentials&scope=openid';
-        const userkey = '67472340-c6fc-4345-b266-d082f1cbbfd6:Sp_VEuev5DsGcP1c30fxVPOaErhfJsYzPFpUrrRuu9bRlK1jLBVzNrbJnk1YKM2sd2QkddxwW5xT50iF5PhcfA';
+        const url = this.configService.get<string>('IDP_URL') || '';
+        const userkey = this.configService.get<string>('IDP_USERKEY') || '';
         const auth = 'Basic ' + Buffer.from(userkey).toString('base64');
 
         const response = await fetch(url, {

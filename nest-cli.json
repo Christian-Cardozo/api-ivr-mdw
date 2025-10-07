@@ -28,6 +28,15 @@
         "tsConfigPath": "libs/auth-client/tsconfig.lib.json"
       }
     },
+    "config": {
+      "type": "library",
+      "root": "libs/config",
+      "entryFile": "index",
+      "sourceRoot": "libs/config/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/config/tsconfig.lib.json"
+      }
+    },
     "mulesoft-customer-ms": {
       "type": "application",
       "root": "apps/mulesoft-customer-ms",

@@ -15,6 +15,7 @@ export class MulesoftController {
   }
 
   @Get('customer-management-dni/:dni')
+  @XmlResponse()
   getMulesoftCustomerByDNI(
     @Param('dni') dni: string
     //@Query('type', new DefaultValuePipe('dni')) type: 'dni' | 'passport' | 'cuit',
