@@ -8,4 +8,4 @@ import { MulesoftModule } from './mulesoft/mulesoft.module';
   controllers: [ApiGatewayController],
   providers: [ApiGatewayService],
 })
-export class ApiGatewayModule {}
+export class ApiGatewayModule { }

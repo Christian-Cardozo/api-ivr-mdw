@@ -39,6 +39,12 @@
       ],
       "@app/redis/*": [
         "libs/redis/src/*"
+      ],
+      "@app/xml": [
+        "libs/xml/src"
+      ],
+      "@app/xml/*": [
+        "libs/xml/src/*"
       ]
     }
   }

@@ -6,10 +6,10 @@ export class MulesoftService {
 
   constructor(
     private readonly authService: AuthClientService,
-  ) {}
+  ) { }
 
-  async getMulesoftCustomerByANI(ani:string) {
-    
+  async getMulesoftCustomerByANI(ani: string) {
+
     const url = `https://mule.telecom.com.ar/customer-mngmt-proc-api-prod/api/v1/customer?excludeNulls=true&deepLevel=3&mobileNumber=${ani}`
     const client = "67472340-c6fc-4345-b266-d082f1cbbfd6";
     const token = await this.authService.getToken();
@@ -27,14 +27,18 @@ export class MulesoftService {
 
     if (!response.ok) {
       const txt = await response.text();
-      throw new HttpException(txt || 'Upstream error', response.status);
+      throw new HttpException(
+        { message: txt || 'Upstream error', statusText: response.statusText },
+        response.status,
+      );
+
     }
 
     return response.json();
   }
 
-  async getMulesoftCustomerByDNI(dni:string) {
-    
+  async getMulesoftCustomerByDNI(dni: string) {
+
     const url = `https://mule.telecom.com.ar/customer-mngmt-proc-api-prod/api/v1/customer?excludeNulls=true&deepLevel=3&documentType=DNI&documentNumber=${dni}`
     const client = "67472340-c6fc-4345-b266-d082f1cbbfd6";
     const token = await this.authService.getToken();;

@@ -1,11 +1,13 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { MulesoftService } from './mulesoft.service';
+import { XmlResponse } from '@app/xml/xml-response.decorator';
 
 @Controller('mulesoft')
 export class MulesoftController {
   constructor(private readonly mulesoftService: MulesoftService) { }
 
   @Get('customer-management-ani/:ani')
+  @XmlResponse()
   getMulesoftCustomerByANI(
     @Param('ani') ani: string
   ) {
