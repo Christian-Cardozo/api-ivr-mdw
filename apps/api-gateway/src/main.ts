@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { ApiGatewayModule } from './api-gateway.module';
+import { RequestMethod } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(ApiGatewayModule);
@@ -9,7 +10,9 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   // Prefijo global (como ya tenías)
-  app.setGlobalPrefix('api/ivr-mdw');
+  app.setGlobalPrefix('api/ivr-mdw', {
+    exclude: [{ path: 'health', method: RequestMethod.GET }],
+  });
 
   // Puerto y host desde env/config
   const port = configService.get<number>('APP_PORT', 3000);

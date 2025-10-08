@@ -28,6 +28,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/microservices": "^11.1.6",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/terminus": "^11.0.0",
     "cache-manager": "^7.2.3",
     "js2xmlparser": "^5.0.0",
     "reflect-metadata": "^0.2.2",
