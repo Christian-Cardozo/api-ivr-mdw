@@ -98,6 +98,8 @@ deploy-dev:
   extends: .deploy-template
   tags: [ ivr-dev-01 ]   # corre en el manager dev (como ya tenías)
   only: { refs: [ dev ] }
+  environment:
+    name: development
   variables:
     ENV_NAME: "development"    
     STACK_NAME: "ivr-stack-dev"
@@ -109,6 +111,8 @@ deploy-preprod:
   extends: .deploy-template
   tags: [ ivr-preprod-01 ]
   only: { refs: [ preprod ] }
+  environment:
+    name: preproduction
   variables:
     ENV_NAME: "preproduction"    
     STACK_NAME: "ivr-stack-preprod"
@@ -118,6 +122,8 @@ deploy-slz:
   extends: .deploy-template
   tags: [ ivr-prod-slz ]
   only: { refs: [ prod ] }
+  environment:
+    name: production
   variables:
     ENV_NAME: "production"    
     STACK_NAME: "ivr-stack-slz"
@@ -127,6 +133,8 @@ deploy-hor:
   extends: .deploy-template
   tags: [ ivr-prod-hor ]
   only: { refs: [ prod ] }
+  environment:
+    name: production
   variables:
     ENV_NAME: "production"    
     STACK_NAME: "ivr-stack-hor"
