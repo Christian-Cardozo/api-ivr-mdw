@@ -89,6 +89,9 @@ build-prod-mule:
     - echo "Deploy $ENV_NAME via Swarm"
     - export IMAGE_TAG="${IMAGE_TAG}-${CI_COMMIT_SHORT_SHA}"
     - docker stack deploy --with-registry-auth -c deploy/docker-stack.yml "$STACK_NAME"
+    - echo "APP_PORT= $APP_PORT"
+    - echo "REDIS_HOST= $REDIS_HOST"
+    - echo "IMAGE_TAG para Swarm= $IMAGE_TAG"
   dependencies: []  
 
 deploy-dev:
