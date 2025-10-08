@@ -87,14 +87,9 @@ build-prod-mule:
   before_script: *docker_prereqs
   script:
     - echo "Deploy $ENV_NAME via Swarm"
-    # opcional: remover servicios antiguos que no estén en el stack ya no es necesario
-    - >
-      IMAGE_TAG="${IMAGE_TAG}-${CI_COMMIT_SHORT_SHA}"
-      docker stack deploy
-      --with-registry-auth \
-      -c deploy/docker-stack.yml
-      $STACK_NAME
-  dependencies: []  # no baja artifacts del build; usamos imágenes del registry
+    - export IMAGE_TAG="${IMAGE_TAG}-${CI_COMMIT_SHORT_SHA}"
+    - docker stack deploy --with-registry-auth -c deploy/docker-stack.yml "$STACK_NAME"
+  dependencies: []  
 
 deploy-dev:
   extends: .deploy-template
