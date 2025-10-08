@@ -6,10 +6,8 @@ networks:
 
 services:
   api-gateway:
-    image: ${CI_REGISTRY_IMAGE}/api-ivr-mdw/api-gateway:${IMAGE_TAG}
-    env_file: ./.env
-    environment:
-      APP_ENV: prod
+    image: ${CI_REGISTRY_IMAGE}/api-ivr-mdw/api-gateway:${IMAGE_TAG}    
+    environment: ${ENV_NAME}    
     networks: [ivr-net]
     ports:
       - "8080:3000"
@@ -31,10 +29,8 @@ services:
       retries: 3
 
   mulesoft-customer-ms:
-    image: ${CI_REGISTRY_IMAGE}/api-ivr-mdw/mulesoft-customer-ms:${IMAGE_TAG}
-    env_file: ./.env
-    environment:
-      APP_ENV: prod
+    image: ${CI_REGISTRY_IMAGE}/api-ivr-mdw/mulesoft-customer-ms:${IMAGE_TAG} 
+    environment: ${ENV_NAME}
     networks: [ivr-net]
     deploy:
       mode: replicated

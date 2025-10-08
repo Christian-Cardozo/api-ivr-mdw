@@ -69,7 +69,7 @@ build-prod-api:
   variables:
     IMAGE_TAG: "prod"
     APP_NAME: "api-gateway"
-    IMAGE_NAME: "api-ivr/mdw-api-gateway"
+    IMAGE_NAME: "api-ivr-mdw/api-gateway"
 
 build-prod-mule:
   extends: .build-template
@@ -91,6 +91,7 @@ build-prod-mule:
     - >
       IMAGE_TAG="${IMAGE_TAG}-${CI_COMMIT_SHORT_SHA}"
       docker stack deploy
+      --with-registry-auth \
       -c deploy/docker-stack.yml
       $STACK_NAME
   dependencies: []  # no baja artifacts del build; usamos imágenes del registry
@@ -101,9 +102,24 @@ deploy-dev:
   only: { refs: [ dev ] }
   variables:
     ENV_NAME: "development"
+    NODE_ENV: "development"
     STACK_NAME: "ivr-stack-dev"
     IMAGE_TAG: "dev"
-    # réplicas override por env (opcional)
+    APP_ENV: "dev"
+    COMPOSE_PROJECT_NAME: "api-ivr-mdw"
+    APP_PORT: $DEV_APP_PORT
+    APP_HOST: $DEV_APP_HOST
+    REDIS_HOST: $DEV_REDIS_HOST
+    REDIS_PORT: $DEV_REDIS_PORT
+    REDIS_PASSWORD: $DEV_REDIS_PASSWORD
+    IDP_URL: $DEV_IDP_URL
+    IDP_USERKEY: $DEV_IDP_USERKEY
+    MULE_TIMEOUT_MS: $DEV_MULE_TIMEOUT_MS
+    MULE_RETRIES: $DEV_MULE_RETRIES
+    MULE_BASE_URL: $DEV_MULE_BASE_URL
+    MULE_CLIENT_ID: $DEV_MULE_CLIENT_ID
+    MULESOFT_CUSTOMER_MS_HOST: $DEV_MULESOFT_CUSTOMER_MS_HOST
+    MULESOFT_CUSTOMER_MS_PORT: $DEV_MULESOFT_CUSTOMER_MS_PORT
     API_GATEWAY_REPLICAS: "1"
     MULESVC_REPLICAS: "1"
 
@@ -113,8 +129,24 @@ deploy-preprod:
   only: { refs: [ preprod ] }
   variables:
     ENV_NAME: "preproduction"
+    NODE_ENV: "preproduction"
     STACK_NAME: "ivr-stack-preprod"
     IMAGE_TAG: "preprod"
+    APP_ENV: "preprod"
+    COMPOSE_PROJECT_NAME: "api-ivr-mdw"
+    APP_PORT: $PREPROD_APP_PORT
+    APP_HOST: $PREPROD_APP_HOST
+    REDIS_HOST: $PREPROD_REDIS_HOST
+    REDIS_PORT: $PREPROD_REDIS_PORT
+    REDIS_PASSWORD: $PREPROD_REDIS_PASSWORD
+    IDP_URL: $PREPROD_IDP_URL
+    IDP_USERKEY: $PREPROD_IDP_USERKEY
+    MULE_TIMEOUT_MS: $PREPROD_MULE_TIMEOUT_MS
+    MULE_RETRIES: $PREPROD_MULE_RETRIES
+    MULE_BASE_URL: $PREPROD_MULE_BASE_URL
+    MULE_CLIENT_ID: $PREPROD_MULE_CLIENT_ID
+    MULESOFT_CUSTOMER_MS_HOST: $PREPROD_MULESOFT_CUSTOMER_MS_HOST
+    MULESOFT_CUSTOMER_MS_PORT: $PREPROD_MULESOFT_CUSTOMER_MS_PORT    
     API_GATEWAY_REPLICAS: "2"
     MULESVC_REPLICAS: "2"
 
@@ -124,10 +156,26 @@ deploy-slz:
   only: { refs: [ prod ] }
   variables:
     ENV_NAME: "production"
+    NODE_ENV: "production"
     STACK_NAME: "ivr-stack-slz"
     IMAGE_TAG: "prod"
-    API_GATEWAY_REPLICAS: "3"
-    MULESVC_REPLICAS: "3"
+    APP_ENV: "prod"
+    COMPOSE_PROJECT_NAME: "api-ivr-mdw"
+    APP_PORT: $PROD_APP_PORT
+    APP_HOST: $PROD_APP_HOST
+    REDIS_HOST: $PROD_REDIS_HOST
+    REDIS_PORT: $PROD_REDIS_PORT
+    REDIS_PASSWORD: $PROD_REDIS_PASSWORD
+    IDP_URL: $PROD_IDP_URL
+    IDP_USERKEY: $PROD_IDP_USERKEY
+    MULE_TIMEOUT_MS: $PROD_MULE_TIMEOUT_MS
+    MULE_RETRIES: $PROD_MULE_RETRIES
+    MULE_BASE_URL: $PROD_MULE_BASE_URL
+    MULE_CLIENT_ID: $PROD_MULE_CLIENT_ID
+    MULESOFT_CUSTOMER_MS_HOST: $PROD_MULESOFT_CUSTOMER_MS_HOST
+    MULESOFT_CUSTOMER_MS_PORT: $PROD_MULESOFT_CUSTOMER_MS_PORT 
+    API_GATEWAY_REPLICAS: $PROD_API_GATEWAY_REPLICAS
+    MULESVC_REPLICAS: $PROD_MULESVC_REPLICAS
 
 deploy-hor:
   extends: .deploy-template
@@ -135,7 +183,23 @@ deploy-hor:
   only: { refs: [ prod ] }
   variables:
     ENV_NAME: "production"
+    NODE_ENV: "production"
     STACK_NAME: "ivr-stack-hor"
     IMAGE_TAG: "prod"
-    API_GATEWAY_REPLICAS: "3"
-    MULESVC_REPLICAS: "3"
+    APP_ENV: "prod"
+    COMPOSE_PROJECT_NAME: "api-ivr-mdw"
+    APP_PORT: $PROD_APP_PORT
+    APP_HOST: $PROD_APP_HOST
+    REDIS_HOST: $PROD_REDIS_HOST
+    REDIS_PORT: $PROD_REDIS_PORT
+    REDIS_PASSWORD: $PROD_REDIS_PASSWORD
+    IDP_URL: $PROD_IDP_URL
+    IDP_USERKEY: $PROD_IDP_USERKEY
+    MULE_TIMEOUT_MS: $PROD_MULE_TIMEOUT_MS
+    MULE_RETRIES: $PROD_MULE_RETRIES
+    MULE_BASE_URL: $PROD_MULE_BASE_URL
+    MULE_CLIENT_ID: $PROD_MULE_CLIENT_ID
+    MULESOFT_CUSTOMER_MS_HOST: $PROD_MULESOFT_CUSTOMER_MS_HOST
+    MULESOFT_CUSTOMER_MS_PORT: $PROD_MULESOFT_CUSTOMER_MS_PORT 
+    API_GATEWAY_REPLICAS: $PROD_API_GATEWAY_REPLICAS
+    MULESVC_REPLICAS: $PROD_MULESVC_REPLICAS
