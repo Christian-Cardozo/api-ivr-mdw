@@ -83,20 +83,17 @@ build-prod-mule:
 
 .deploy-template:
   stage: deploy
-  image: $CI_REGISTRY_IMAGE/ci/docker-cli   # tu imagen cli (con docker cli instalado)
+  image: $CI_REGISTRY_IMAGE/ci/docker-cli   
   before_script: *docker_prereqs
   script:
     - echo "Deploy $ENV_NAME via Swarm"
     - export IMAGE_TAG="${IMAGE_TAG}-${CI_COMMIT_SHORT_SHA}"
     - docker stack deploy --with-registry-auth -c deploy/docker-stack.yml "$STACK_NAME"
-    - echo "APP_PORT= $APP_PORT"
-    - echo "REDIS_HOST= $REDIS_HOST"
-    - echo "IMAGE_TAG para Swarm= $IMAGE_TAG"
   dependencies: []  
 
 deploy-dev:
   extends: .deploy-template
-  tags: [ ivr-dev-01 ]   # corre en el manager dev (como ya tenías)
+  tags: [ ivr-dev-01 ]   
   only: { refs: [ dev ] }
   environment:
     name: development
