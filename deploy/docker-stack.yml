@@ -12,10 +12,7 @@ services:
       APP_ENV: prod
     networks: [ivr-net]
     ports:
-      - target: 3000
-        published: 3000
-        protocol: tcp
-        mode: host
+      - "8080:3000"
     deploy:
       mode: replicated
       replicas: ${API_GATEWAY_REPLICAS:-2}
