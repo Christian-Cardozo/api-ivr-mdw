@@ -23,44 +23,8 @@ services:
       MULE_CLIENT_ID: ${MULE_CLIENT_ID}
       MULESOFT_CUSTOMER_MS_HOST: ${MULESOFT_CUSTOMER_MS_HOST}
       MULESOFT_CUSTOMER_MS_PORT: ${MULESOFT_CUSTOMER_MS_PORT}
-    networks: [ivr-net]    
-    ports:
-      - "8080:3000"
-    deploy:
-      mode: replicated
-      replicas: ${API_GATEWAY_REPLICAS:-2}
-      restart_policy: { condition: any }
-      resources:
-        limits: { cpus: "0.50", memory: 512M }
-        reservations: { memory: 256M }
-      update_config:
-        parallelism: 1
-        delay: 5s
-        order: start-first
-    healthcheck:
-      version: "3.8"
-      
-services:
-  api-gateway:
-    image: ${CI_REGISTRY_IMAGE}/api-ivr-mdw/api-gateway:${IMAGE_TAG}
-    environment:
-      NODE_ENV: ${NODE_ENV:-production}
-      APP_ENV:  ${APP_ENV:-prod}
-      APP_PORT: ${APP_PORT}
-      APP_HOST: ${APP_HOST}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-      IDP_URL: ${IDP_URL}
-      IDP_USERKEY: ${IDP_USERKEY}
-      MULE_TIMEOUT_MS: ${MULE_TIMEOUT_MS}
-      MULE_RETRIES: ${MULE_RETRIES}
-      MULE_BASE_URL: ${MULE_BASE_URL}
-      MULE_CLIENT_ID: ${MULE_CLIENT_ID}
-      MULESOFT_CUSTOMER_MS_HOST: ${MULESOFT_CUSTOMER_MS_HOST}
-      MULESOFT_CUSTOMER_MS_PORT: ${MULESOFT_CUSTOMER_MS_PORT}
     networks: [ivr-net]
-    # En prod Linux, dejá shorthand (ingress):
+    # En Linux prod podés usar ingress (shorthand):
     ports:
       - "8080:3000"
     deploy:
@@ -75,9 +39,9 @@ services:
         delay: 5s
         order: start-first
     healthcheck:
-      # Si EXCLUISTE /health del prefix, dejá esta:
+      # Si /health está sin prefix:
       test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
-      # Si NO lo excluiste y tenés prefix, usar:
+      # Si tenés prefix global, cámbialo a:
       # test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/ivr-mdw/health"]
       interval: 30s
       timeout: 5s
@@ -100,45 +64,6 @@ services:
       MULE_RETRIES: ${MULE_RETRIES}
       MULE_BASE_URL: ${MULE_BASE_URL}
       MULE_CLIENT_ID: ${MULE_CLIENT_ID}
-      # Este MS expone TCP interno; no publicar puertos hacia fuera
-    networks: [ivr-net]
-    deploy:
-      mode: replicated
-      replicas: ${MULESVC_REPLICAS:-2}
-      restart_policy: { condition: any }
-      resources:
-        limits: { cpus: "0.25", memory: 256M }
-        reservations: { memory: 128M }
-
-  redis:
-    image: redis:7-alpine
-    networks: [ivr-net]
-    deploy:
-      placement:
-        constraints: [ "node.role == manager" ]
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]      
-      interval: 30s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-
-  mulesoft-customer-ms:
-    image: ${CI_REGISTRY_IMAGE}/api-ivr-mdw/mulesoft-customer-ms:${IMAGE_TAG}
-    environment:
-      NODE_ENV: ${NODE_ENV:-production}
-      APP_ENV:  ${APP_ENV:-prod}
-      APP_HOST: ${APP_HOST}
-      APP_PORT: ${APP_PORT}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-      IDP_URL: ${IDP_URL}
-      IDP_USERKEY: ${IDP_USERKEY}
-      MULE_TIMEOUT_MS: ${MULE_TIMEOUT_MS}
-      MULE_RETRIES: ${MULE_RETRIES}
-      MULE_BASE_URL: ${MULE_BASE_URL}
-      MULE_CLIENT_ID: ${MULE_CLIENT_ID}
-      # Este MS expone TCP interno; no publicar puertos hacia fuera
     networks: [ivr-net]
     deploy:
       mode: replicated
