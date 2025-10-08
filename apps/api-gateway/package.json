@@ -1,0 +1,9 @@
+{
+  "name": "api-gateway",
+  "private": true,
+  "scripts": {
+    "build": "nest build api-gateway",
+    "start:prod": "node dist/apps/api-gateway/main.js",
+    "start:dev": "nest start api-gateway --watch"
+  }
+}

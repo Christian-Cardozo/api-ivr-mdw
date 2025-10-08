@@ -1,0 +1,141 @@
+default:
+  tags:
+    - teco-dc4
+
+variables:
+  http_proxy: "http://proxyappl.telecom.arg.telecom.com.ar:8080"
+  https_proxy: "http://proxyappl.telecom.arg.telecom.com.ar:8080"
+  no_proxy: "localhost,127.0.0.1"
+  DOCKER_BUILDKIT: "1"
+  COMPOSE_DOCKER_CLI_BUILD: "1"
+
+stages: [ build, deploy ]
+
+.docker_prereqs: &docker_prereqs
+  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+
+# ===================== BUILD =====================
+
+.build-template:
+  stage: build
+  image: docker:27
+  services: [ docker:27-dind ]
+  before_script: *docker_prereqs
+  script:
+    # Construye y pushea UNA APP (parametrizable por variables del job)
+    - >
+      docker build
+      --pull
+      --build-arg APP_NAME=${APP_NAME}
+      -t $CI_REGISTRY_IMAGE/${IMAGE_NAME}:${IMAGE_TAG}-${CI_COMMIT_SHORT_SHA}
+      -f Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE/${IMAGE_NAME}:${IMAGE_TAG}-${CI_COMMIT_SHORT_SHA}
+
+build-dev-api:
+  extends: .build-template
+  only: { refs: [ dev ] }
+  variables:
+    IMAGE_TAG: "dev"
+    APP_NAME: "api-gateway"
+    IMAGE_NAME: "api-ivr-mdw/api-gateway"
+
+build-dev-mule:
+  extends: .build-template
+  only: { refs: [ dev ] }
+  variables:
+    IMAGE_TAG: "dev"
+    APP_NAME: "mulesoft-customer-ms"
+    IMAGE_NAME: "api-ivr-mdw/mulesoft-customer-ms"
+
+build-preprod-api:
+  extends: .build-template
+  only: { refs: [ preprod ] }
+  variables:
+    IMAGE_TAG: "preprod"
+    APP_NAME: "api-gateway"
+    IMAGE_NAME: "api-ivr-mdw/api-gateway"
+
+build-preprod-mule:
+  extends: .build-template
+  only: { refs: [ preprod ] }
+  variables:
+    IMAGE_TAG: "preprod"
+    APP_NAME: "mulesoft-customer-ms"
+    IMAGE_NAME: "api-ivr-mdw/mulesoft-customer-ms"
+
+build-prod-api:
+  extends: .build-template
+  only: { refs: [ prod ] }
+  variables:
+    IMAGE_TAG: "prod"
+    APP_NAME: "api-gateway"
+    IMAGE_NAME: "api-ivr/mdw-api-gateway"
+
+build-prod-mule:
+  extends: .build-template
+  only: { refs: [ prod ] }
+  variables:
+    IMAGE_TAG: "prod"
+    APP_NAME: "mulesoft-customer-ms"
+    IMAGE_NAME: "api-ivr-mdw/mulesoft-customer-ms"
+
+# ===================== DEPLOY =====================
+
+.deploy-template:
+  stage: deploy
+  image: $CI_REGISTRY_IMAGE/ci/docker-cli   # tu imagen cli (con docker cli instalado)
+  before_script: *docker_prereqs
+  script:
+    - echo "Deploy $ENV_NAME via Swarm"
+    # opcional: remover servicios antiguos que no estén en el stack ya no es necesario
+    - >
+      IMAGE_TAG="${IMAGE_TAG}-${CI_COMMIT_SHORT_SHA}"
+      docker stack deploy
+      -c deploy/docker-stack.yml
+      $STACK_NAME
+  dependencies: []  # no baja artifacts del build; usamos imágenes del registry
+
+deploy-dev:
+  extends: .deploy-template
+  tags: [ ivr-dev-01 ]   # corre en el manager dev (como ya tenías)
+  only: { refs: [ dev ] }
+  variables:
+    ENV_NAME: "development"
+    STACK_NAME: "ivr-stack-dev"
+    IMAGE_TAG: "dev"
+    # réplicas override por env (opcional)
+    API_GATEWAY_REPLICAS: "1"
+    MULESVC_REPLICAS: "1"
+
+deploy-preprod:
+  extends: .deploy-template
+  tags: [ ivr-preprod-01 ]
+  only: { refs: [ preprod ] }
+  variables:
+    ENV_NAME: "preproduction"
+    STACK_NAME: "ivr-stack-preprod"
+    IMAGE_TAG: "preprod"
+    API_GATEWAY_REPLICAS: "2"
+    MULESVC_REPLICAS: "2"
+
+deploy-slz:
+  extends: .deploy-template
+  tags: [ ivr-prod-slz ]
+  only: { refs: [ prod ] }
+  variables:
+    ENV_NAME: "production"
+    STACK_NAME: "ivr-stack-slz"
+    IMAGE_TAG: "prod"
+    API_GATEWAY_REPLICAS: "3"
+    MULESVC_REPLICAS: "3"
+
+deploy-hor:
+  extends: .deploy-template
+  tags: [ ivr-prod-hor ]
+  only: { refs: [ prod ] }
+  variables:
+    ENV_NAME: "production"
+    STACK_NAME: "ivr-stack-hor"
+    IMAGE_TAG: "prod"
+    API_GATEWAY_REPLICAS: "3"
+    MULESVC_REPLICAS: "3"

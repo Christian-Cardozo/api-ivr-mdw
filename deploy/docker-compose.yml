@@ -1,0 +1,32 @@
+services:
+  api-gateway:
+    build:
+      context: ..
+      dockerfile: ./Dockerfile
+      args: { APP_NAME: api-gateway }
+    env_file:
+      - ./.env
+    environment:
+      APP_ENV: prod          # asegura modo prod (tu app tomará process.env)
+    ports:
+      - "8080:3000"
+    depends_on:
+      - mulesoft-customer-ms
+      - redis
+
+  mulesoft-customer-ms:
+    build:
+      context: ..
+      dockerfile: ./Dockerfile
+      args: { APP_NAME: mulesoft-customer-ms }
+    env_file:
+      - ./.env
+    environment:
+      APP_ENV: prod
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
