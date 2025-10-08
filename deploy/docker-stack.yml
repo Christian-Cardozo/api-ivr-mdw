@@ -26,7 +26,7 @@ services:
     networks: [ivr-net]
     # En Linux prod podés usar ingress (shorthand):
     ports:
-      - "8080:3000"
+      - "7000:3000"
     deploy:
       mode: replicated
       replicas: ${API_GATEWAY_REPLICAS:-2}
