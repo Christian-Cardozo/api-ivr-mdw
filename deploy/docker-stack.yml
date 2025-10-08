@@ -39,11 +39,7 @@ services:
         order: start-first
     healthcheck:
       version: "3.8"
-
-networks:
-  ivr-net:
-    driver: overlay
-
+      
 services:
   api-gateway:
     image: ${CI_REGISTRY_IMAGE}/api-ivr-mdw/api-gateway:${IMAGE_TAG}
