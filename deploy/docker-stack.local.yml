@@ -6,7 +6,7 @@ networks:
 
 services:
   api-gateway:
-    image: ${CI_REGISTRY_IMAGE}/api-ivr-mdw/api-gateway:${IMAGE_TAG}
+    image: api-ivr-mdw/api-gateway:latest
     env_file: ./.env
     environment:
       APP_ENV: prod
@@ -18,14 +18,9 @@ services:
         mode: host
     deploy:
       mode: replicated
-      replicas: ${API_GATEWAY_REPLICAS:-2}
+      replicas: 1
       restart_policy: { condition: any }
-      resources:
-        limits: { cpus: "0.50", memory: 512M }
-        reservations: { memory: 256M }
       update_config:
-        parallelism: 1
-        delay: 5s
         order: start-first
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
@@ -34,18 +29,15 @@ services:
       retries: 3
 
   mulesoft-customer-ms:
-    image: ${CI_REGISTRY_IMAGE}/api-ivr-mdw/mulesoft-customer-ms:${IMAGE_TAG}
+    image: api-ivr-mdw/mulesoft-customer-ms:latest
     env_file: ./.env
     environment:
       APP_ENV: prod
     networks: [ivr-net]
     deploy:
       mode: replicated
-      replicas: ${MULESVC_REPLICAS:-2}
+      replicas: 1
       restart_policy: { condition: any }
-      resources:
-        limits: { cpus: "0.25", memory: 256M }
-        reservations: { memory: 128M }
 
   redis:
     image: redis:7-alpine
