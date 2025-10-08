@@ -103,9 +103,7 @@ deploy-dev:
   variables:
     ENV_NAME: "development"    
     STACK_NAME: "ivr-stack-dev"
-    IMAGE_TAG: "dev"
-    APP_PORT: $APP_PORT
-    REDIS_HOST: $REDIS_HOST        
+    IMAGE_TAG: "dev"          
 
 deploy-preprod:
   extends: .deploy-template
