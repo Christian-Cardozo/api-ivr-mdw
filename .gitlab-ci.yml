@@ -31,7 +31,7 @@ stages: [ build, deploy ]
       -f Dockerfile .
     - docker push $CI_REGISTRY_IMAGE/${IMAGE_NAME}:${IMAGE_TAG}-${CI_COMMIT_SHORT_SHA}
 
-build-dev-api:
+build-dev-api-gateway:
   extends: .build-template
   only: { refs: [ dev ] }
   variables:
@@ -39,7 +39,7 @@ build-dev-api:
     APP_NAME: "api-gateway"
     IMAGE_NAME: "api-ivr-mdw/api-gateway"
 
-build-dev-mule:
+build-dev-mule-ms:
   extends: .build-template
   only: { refs: [ dev ] }
   variables:
@@ -47,7 +47,7 @@ build-dev-mule:
     APP_NAME: "mulesoft-customer-ms"
     IMAGE_NAME: "api-ivr-mdw/mulesoft-customer-ms"
 
-build-preprod-api:
+build-preprod-api-gateway:
   extends: .build-template
   only: { refs: [ preprod ] }
   variables:
@@ -55,7 +55,7 @@ build-preprod-api:
     APP_NAME: "api-gateway"
     IMAGE_NAME: "api-ivr-mdw/api-gateway"
 
-build-preprod-mule:
+build-preprod-mule-ms:
   extends: .build-template
   only: { refs: [ preprod ] }
   variables:
@@ -63,7 +63,7 @@ build-preprod-mule:
     APP_NAME: "mulesoft-customer-ms"
     IMAGE_NAME: "api-ivr-mdw/mulesoft-customer-ms"
 
-build-prod-api:
+build-prod-api-gateway:
   extends: .build-template
   only: { refs: [ prod ] }
   variables:
@@ -71,7 +71,7 @@ build-prod-api:
     APP_NAME: "api-gateway"
     IMAGE_NAME: "api-ivr-mdw/api-gateway"
 
-build-prod-mule:
+build-prod-mule-ms:
   extends: .build-template
   only: { refs: [ prod ] }
   variables:

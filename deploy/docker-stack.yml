@@ -18,9 +18,7 @@ services:
       IDP_URL: ${IDP_URL}
       IDP_USERKEY: ${IDP_USERKEY}
       MULE_TIMEOUT_MS: ${MULE_TIMEOUT_MS}
-      MULE_RETRIES: ${MULE_RETRIES}
-      MULE_BASE_URL: ${MULE_BASE_URL}
-      MULE_CLIENT_ID: ${MULE_CLIENT_ID}
+      MULE_RETRIES: ${MULE_RETRIES}      
       MULESOFT_CUSTOMER_MS_HOST: ${MULESOFT_CUSTOMER_MS_HOST}
       MULESOFT_CUSTOMER_MS_PORT: ${MULESOFT_CUSTOMER_MS_PORT}
     networks: [ivr-net]
@@ -49,9 +47,7 @@ services:
     image: ${CI_REGISTRY_IMAGE}/api-ivr-mdw/mulesoft-customer-ms:${IMAGE_TAG}
     environment:
       NODE_ENV: ${NODE_ENV}
-      APP_ENV:  ${APP_ENV}
-      APP_HOST: ${APP_HOST}
-      APP_PORT: ${APP_PORT}
+      APP_ENV:  ${APP_ENV}      
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
