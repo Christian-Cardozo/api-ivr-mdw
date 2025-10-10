@@ -85,6 +85,7 @@
       "^@app/auth-client(|/.*)$": "<rootDir>/libs/auth-client/src/$1",
       "^@app/config(|/.*)$": "<rootDir>/libs/config/src/$1",
       "^@app/redis(|/.*)$": "<rootDir>/libs/redis/src/$1",
+      "^@app/resilience(|/.*)$": "<rootDir>/libs/resilience/src/$1",
       "^@app/xml(|/.*)$": "<rootDir>/libs/xml/src/$1"
     }
   }
