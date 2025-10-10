@@ -1,30 +1,32 @@
 import { Module, Global } from '@nestjs/common';
-import { CacheModule } from '@nestjs/cache-manager';
-import KeyvRedis from '@keyv/redis';
+import { RedisService } from './redis.service';
 import { GlobalConfigModule } from '@app/config';
 import { ConfigService } from '@nestjs/config';
 
 @Global()
 @Module({
-  imports: [    
-    CacheModule.registerAsync({
-      imports: [GlobalConfigModule], // necesario para inyectar ConfigService
+  imports: [GlobalConfigModule],
+  providers: [
+    {
+      provide: 'REDIS_CLIENT',
       inject: [ConfigService],
-      useFactory: async (config: ConfigService) => {
-        const host = config.get<string>('REDIS_HOST') || 'localhost';
-        const port = config.get<number>('REDIS_PORT') || 6379;
-        const password = config.get<string>('REDIS_PASSWORD') || '';
+      useFactory: (config: ConfigService) => {
+        const Redis = require('ioredis');
+        const host = config.get<string>('REDIS_HOST', 'localhost');
+        const port = config.get<number>('REDIS_PORT', 6379);
+        const password = config.get<string>('REDIS_PASSWORD');
 
-        const uri = password
-          ? `redis://:${password}@${host}:${port}`
-          : `redis://${host}:${port}`;
-
-        return {
-          stores: [new KeyvRedis(uri)],
-        };
+        return new Redis({
+          host,
+          port,
+          password,
+          maxRetriesPerRequest: 3,
+          retryStrategy: (times) => Math.min(times * 50, 2000),
+        });
       },
-    }),
+    },
+    RedisService,
   ],
-  exports: [CacheModule],
+  exports: [RedisService],
 })
-export class RedisModule { }
+export class RedisModule {}

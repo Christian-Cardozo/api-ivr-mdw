@@ -1,51 +1,62 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { IDPResponse } from './interfaces/idp-response.interface';
-import type { Cache } from 'cache-manager';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
+import { RedisService } from '@app/redis';
+import { IDPResponse } from './interfaces/idp-response.interface';
 
 @Injectable()
 export class AuthClientService {
+  private readonly logger = new Logger(AuthClientService.name);
+  private readonly TOKEN_KEY = 'idp:mule:token';
 
-    constructor(
-        @Inject(CACHE_MANAGER) private cache: Cache,
-        private readonly configService: ConfigService,
-    ) { }
+  constructor(
+    private readonly redis: RedisService,
+    private readonly config: ConfigService,
+  ) {}
 
-    async getToken(): Promise<string> {
-       
-        const cachedToken = await this.cache.get<string>('auth_token');
-        if (cachedToken) {            
-            return cachedToken;
-        }
+  /**
+   * Obtiene el token (de cache o renovado)
+   */
+  async getToken(): Promise<string> {
+    return this.redis.getToken(this.TOKEN_KEY, () => this.fetchToken());
+  }
 
-        const tokenData: IDPResponse = await this.fetchToken(); // tu POST al IdP (con fetch)
-        const token = tokenData.access_token;
-        const ttl = Math.max(30, (tokenData.expires_in ?? 300) - 30); // skew 30s
+  /**
+   * Llama al IDP para obtener un nuevo token
+   */
+  private async fetchToken(): Promise<{ token: string; expiresIn: number }> {
+    const url = this.config.get<string>('IDP_URL') || '';
+    const userkey = this.config.get<string>('IDP_USERKEY') || '';
+    const auth = 'Basic ' + Buffer.from(userkey).toString('base64');
 
-        await this.cache.set('auth_token', token, ttl * 1000);
-        return token;
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: auth,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Error fetching token: ' + response.statusText);
+      }
+
+      const data: IDPResponse = await response.json();
+
+      return {
+        token: data.access_token,
+        expiresIn: data.expires_in || 3600,
+      };
+    } catch (error) {
+      this.logger.error('Failed to fetch token from IDP', error);
+      throw error;
     }
+  }
 
-    async fetchToken(): Promise<IDPResponse> {
-
-        const url = this.configService.get<string>('IDP_URL') || '';
-        const userkey = this.configService.get<string>('IDP_USERKEY') || '';
-        const auth = 'Basic ' + Buffer.from(userkey).toString('base64');
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Authorization': auth,
-                'Content-Type': 'application/json'
-            }
-        })
-
-        if (!response.ok) {
-            throw new Error('Error fetching token: ' + response.statusText);
-        }
-        const data = await response.json();
-        return data;
-    }
+  /**
+   * Invalida el token (útil cuando recibes 401)
+   */
+  async invalidateToken(): Promise<void> {
+    await this.redis.invalidateToken(this.TOKEN_KEY);
+  }
 }
