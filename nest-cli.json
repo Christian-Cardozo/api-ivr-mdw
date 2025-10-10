@@ -55,15 +55,6 @@
         "tsConfigPath": "libs/redis/tsconfig.lib.json"
       }
     },
-    "resilience": {
-      "type": "library",
-      "root": "libs/resilience",
-      "entryFile": "index",
-      "sourceRoot": "libs/resilience/src",
-      "compilerOptions": {
-        "tsConfigPath": "libs/resilience/tsconfig.lib.json"
-      }
-    },
     "xml": {
       "type": "library",
       "root": "libs/xml",
