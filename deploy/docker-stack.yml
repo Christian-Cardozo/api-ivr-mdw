@@ -2,7 +2,8 @@ version: "3.8"
 
 networks:
   ivr-net:
-    driver: overlay
+    external: true
+    name: ivr-net
 
 services:
   api-gateway:
@@ -23,8 +24,8 @@ services:
       MULESOFT_CUSTOMER_MS_PORT: ${MULESOFT_CUSTOMER_MS_PORT}
     networks: [ivr-net]
     # En Linux prod podés usar ingress (shorthand):
-    ports:
-      - "7000:3000"
+    #ports:
+    #  - "7000:3000"
     deploy:
       mode: replicated
       replicas: ${API_GATEWAY_REPLICAS}
