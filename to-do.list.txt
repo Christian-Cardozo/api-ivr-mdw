@@ -1,7 +1,7 @@
 - ✅ (ci) cambiar nombre de los stage en el ci build-dev-api -> build-dev-api-gateway
 - ✅ (redis) agregar logica en la renovacion de token con lock
 - ✅ (deploy) ajustar los stack segun el servicio. ej variables de mule no van en api 
-- (mule-ms) agregar la logia de corte y reintentos
+- ✅ (mule-ms) agregar la logia de corte y reintentos
 - (deploy) agregar traefik
 - (docs) configurar correctamente el readme
 - (docs) agregar documentacion del proceso y/o codigo
