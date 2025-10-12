@@ -2,8 +2,7 @@ version: "3.8"
 
 networks:
   ivr-net:
-    external: true
-    name: ivr-net
+    driver: overlay
 
 services:
   api-gateway:
@@ -22,9 +21,9 @@ services:
       MULE_RETRIES: ${MULE_RETRIES}      
       MULESOFT_CUSTOMER_MS_HOST: ${MULESOFT_CUSTOMER_MS_HOST}
       MULESOFT_CUSTOMER_MS_PORT: ${MULESOFT_CUSTOMER_MS_PORT}
-    networks: [ivr-net]
+    networks: [ivr-net, traefik-public]
     # En Linux prod podés usar ingress (shorthand):
-    #ports:
+    # ports:
     #  - "7000:3000"
     deploy:
       mode: replicated
@@ -37,6 +36,12 @@ services:
         parallelism: 1
         delay: 5s
         order: start-first
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.api-gateway.rule=Host(`api-ivr-mdw`)"
+        - "traefik.http.routers.api-gateway.entrypoints=web"
+        - "traefik.http.services.api-gateway.loadbalancer.server.port=3000"
+        - "traefik.docker.network=traefik-public"
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/health >/dev/null 2>&1 || exit 1"]
       interval: 30s
