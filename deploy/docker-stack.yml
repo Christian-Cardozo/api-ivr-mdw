@@ -3,6 +3,9 @@ version: "3.8"
 networks:
   ivr-net:
     driver: overlay
+  traefik-public:
+    external: true
+    name: traefik-public 
 
 services:
   api-gateway:
