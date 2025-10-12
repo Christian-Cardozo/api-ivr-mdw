@@ -88,6 +88,7 @@ build-prod-mule-ms:
   script:
     - echo "Deploy $ENV_NAME via Swarm"
     - export IMAGE_TAG="${IMAGE_TAG}-${CI_COMMIT_SHORT_SHA}"
+    - export HOST=${HOST}
     - docker stack deploy --with-registry-auth -c deploy/docker-stack.yml "$STACK_NAME"
   dependencies: []  
 
@@ -101,7 +102,7 @@ deploy-dev:
     ENV_NAME: "development"    
     STACK_NAME: "ivr-stack-dev"
     IMAGE_TAG: "dev" 
-    APP_ENV: "dev"         
+    APP_ENV: "dev"        
 
 deploy-preprod:
   extends: .deploy-template
@@ -113,7 +114,7 @@ deploy-preprod:
     ENV_NAME: "preproduction"    
     STACK_NAME: "ivr-stack-preprod"
     IMAGE_TAG: "preprod"   
-    APP_ENV: "preprod" 
+    APP_ENV: "preprod"     
 
 deploy-slz:
   extends: .deploy-template
@@ -126,6 +127,7 @@ deploy-slz:
     STACK_NAME: "ivr-stack-slz"
     IMAGE_TAG: "prod"
     APP_ENV: "prod" 
+    HOST: "slz."
 
 deploy-hor:
   extends: .deploy-template
@@ -138,3 +140,4 @@ deploy-hor:
     STACK_NAME: "ivr-stack-hor"
     IMAGE_TAG: "prod"    
     APP_ENV: "prod"
+    HOST: "hor."     
