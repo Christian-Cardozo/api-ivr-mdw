@@ -1,7 +1,6 @@
 import { Body, Controller, Get, HttpException, Param, Post, Query } from '@nestjs/common';
 import { MulesoftService } from './mulesoft.service';
 import { XmlResponse } from '@app/xml/xml-response.decorator';
-import { firstValueFrom } from 'rxjs';
 
 @Controller('mulesoft')
 export class MulesoftController {
