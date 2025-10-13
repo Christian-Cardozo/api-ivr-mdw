@@ -7,3 +7,5 @@
 - (docs) agregar documentacion del proceso y/o codigo
 - (test) agregar unit test si sirve
 - (ci) agregar reglas de deploy si se modificaron
+- (mule-ms) agregar logica de depurado de response
+- (all) agregar validationpipes para los params recibidos

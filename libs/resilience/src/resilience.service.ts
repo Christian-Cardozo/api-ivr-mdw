@@ -1,4 +1,5 @@
 import { Injectable, Logger, RequestTimeoutException } from '@nestjs/common';
+import { CircuitBreaker } from './circuit-breaker';
 
 export interface RetryConfig {
     maxRetries?: number; // Número de reintentos
@@ -11,46 +12,42 @@ export interface RetryConfig {
 export class ResilienceService {
 
     private readonly logger = new Logger(ResilienceService.name);
+    private readonly breaker = new CircuitBreaker({ failureThreshold: 3, resetTimeoutMs: 15000 });
 
-    /**
-    * Executes an asynchronous function with retry logic.
-    * (Ejecuta una función asíncrona con reintentos configurables)
-    *
-    * @template T - Return type of the async function.
-    * @param {string} key - Unique identifier (for logging or distributed locks).
-    * @param {() => Promise<T>} fn - Async function to execute.
-    * @param {RetryConfig} [config={}] - Optional retry settings (max attempts, delay, backoff, etc.).
-    * @returns {Promise<T>} Resolves with the result of `fn` when successful.
-    * @throws {Error} If all retry attempts fail.
-    *
-    * @example
-    * await execWithRetry('fetchUser', () => api.getUser(id), { retries: 3, delay: 500 });
-    */
+    async execute<T>(
+        key: string,
+        fn: (signal?: AbortSignal) => Promise<T>,
+        config: RetryConfig = {}
+    ): Promise<T> {
+        return this.breaker.execute(key, () => this.executeWithRetry(key, fn, config));
+    }
+
+
     async executeWithRetry<T>(
-        key: string, 
-        fn: (signal?: AbortSignal) => Promise<T>, 
+        key: string,
+        fn: (signal?: AbortSignal) => Promise<T>,
         config: RetryConfig = {}
     ): Promise<T> {
 
-        const { 
-            maxRetries = 3, 
-            retryDelayMs = 1000, 
-            timeoutMs = 5000, 
-            retryOn = this.defaultRetryOn 
+        const {
+            maxRetries = 3,
+            retryDelayMs = 1000,
+            timeoutMs = 5000,
+            retryOn = this.defaultRetryOn
         } = config;
 
         //console.log({ maxRetries, retryDelayMs, timeoutMs });
 
-        let lastError: Error;        
+        let lastError: Error;
 
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
 
-                const controller = new AbortController();                
+                const controller = new AbortController();
 
                 const result = await this.executeWithTimeout(fn, timeoutMs, controller);
 
-                if (attempt > 0) {                    
+                if (attempt > 0) {
                     this.logger.log(`✅ Éxito en intento ${attempt}/${maxRetries} para ${key}`);
                 }
 
@@ -58,7 +55,7 @@ export class ResilienceService {
             }
             catch (error) {
 
-                lastError = error as Error;                
+                lastError = error as Error;
 
                 if (!retryOn(error)) {
                     this.logger.warn(`❌ Error no reintentable para ${key}`);
@@ -82,22 +79,6 @@ export class ResilienceService {
         throw lastError!;
     }
 
-    /**
-    * Executes an asynchronous function with a timeout, using an AbortController for cooperative cancellation.
-    * (Ejecuta una función asíncrona con un tiempo de espera límite, utilizando AbortController
-    * para la cancelación cooperativa.)
-    *
-    * IMPORTANT: The provided function 'fn' MUST respect the AbortSignal to ensure the timeout works correctly.
-    * (IMPORTANTE: La función 'fn' provista DEBE respetar la AbortSignal para asegurar que el timeout funcione correctamente.)
-    *
-    * @template T - Return type of the async function.
-    * @param {(signal?: AbortSignal) => Promise<T>} fn - The asynchronous function to execute, which accepts an optional AbortSignal.
-    * @param {number} timeoutMs - The maximum time in milliseconds to wait for the function to complete.
-    * @param {AbortController} controller - The AbortController managing the operation's signal.
-    * @returns {Promise<T>} Resolves with the result of 'fn'.
-    * @throws {RequestTimeoutException} If the timeout is reached and the signal is aborted.
-    * @throws {Error} If the operation fails for any other reason.
-    */
     private async executeWithTimeout<T>(
         fn: (signal?: AbortSignal) => Promise<T>,
         timeoutMs: number,
@@ -123,11 +104,11 @@ export class ResilienceService {
     }
 
     private readonly defaultRetryOn = (error: any): boolean => {
-    // No reintentar errores del cliente (4xx)
-    if (error?.status >= 400 && error?.status < 500) {
-        return false;
-    }
-    // Sí reintentar 5xx, timeouts, y errores de red
-    return true;
-};
+        // No reintentar errores del cliente (4xx)
+        if (error?.status >= 400 && error?.status < 500) {
+            return false;
+        }
+        // Sí reintentar 5xx, timeouts, y errores de red
+        return true;
+    };
 }

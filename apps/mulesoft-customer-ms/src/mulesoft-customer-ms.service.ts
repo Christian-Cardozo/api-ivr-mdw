@@ -1,5 +1,6 @@
 import { AuthClientService } from '@app/auth-client';
 import { ResilienceService, RetryConfig } from '@app/resilience';
+import { Retry } from '@app/resilience/retry.decorator';
 import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -33,28 +34,25 @@ export class MulesoftCustomerMsService {
   }
 
 
-  async getByANI(ani: string) {
+  //@Retry('mule:getByANI')
+  async getByANI(ani: string, signal?: AbortSignal) {
     const url = `${this.baseUrl}/api/v1/customer?excludeNulls=true&deepLevel=3&mobileNumber=${ani}`;
 
-    return this.resilience.executeWithRetry(
+    return this.resilience.execute(
       'mule:getByANI',
       (signal) => this.fetchCustomer(url, signal),
       this.retryConfig,
     );
   }
 
+  //@Retry('mule:getByDNI')
   async getByDNI(dni: string) {
     const url = `${this.baseUrl}/api/v1/customer?excludeNulls=true&deepLevel=3&documentType=DNI&documentNumber=${dni}`;
 
-    return this.resilience.executeWithRetry(
+    return this.resilience.execute(
       'mule:getByDNI',
       (signal) => this.fetchCustomer(url, signal),
-      {
-        maxRetries: this.maxRetries,
-        timeoutMs: this.timeout,
-        retryDelayMs: 1000,
-        retryOn: (error) => this.shouldRetry(error),
-      },
+      this.retryConfig,
     );
   }
 
@@ -72,12 +70,12 @@ export class MulesoftCustomerMsService {
       const response = await fetch(url, {
         method: 'GET',
         headers,
-        signal, 
+        signal,
       });
 
       if (!response.ok) {
         const txt = await response.text();
-      
+
         throw new HttpException(
           {
             message: txt || 'Upstream error',
