@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Param, Post, Query } from '@nestjs/common';
 import { MulesoftService } from './mulesoft.service';
 import { XmlResponse } from '@app/xml/xml-response.decorator';
+import { firstValueFrom } from 'rxjs';
 
 @Controller('mulesoft')
 export class MulesoftController {
@@ -8,7 +9,7 @@ export class MulesoftController {
 
   @Get('customer-management-ani/:ani')
   @XmlResponse()
-  getMulesoftCustomerByANI(
+  async getMulesoftCustomerByANI(
     @Param('ani') ani: string
   ) {
     return this.mulesoftService.getMulesoftCustomerByANI(ani);
@@ -16,11 +17,10 @@ export class MulesoftController {
 
   @Get('customer-management-dni/:dni')
   @XmlResponse()
-  getMulesoftCustomerByDNI(
-    @Param('dni') dni: string
-    //@Query('type', new DefaultValuePipe('dni')) type: 'dni' | 'passport' | 'cuit',
-  ) {
-    return this.mulesoftService.getMulesoftCustomerByDNI(dni);
+  async getMulesoftCustomerByDNI(
+    @Param('dni') dni: string    
+  ) {  
+    return this.mulesoftService.getMulesoftCustomerByDNI(dni);    
   }
 
   @Post('cancellation-process-accept')

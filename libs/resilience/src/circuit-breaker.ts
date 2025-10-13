@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import { NonRetryableError } from 'libs/common/errors';
 
 export type CircuitState = 'CLOSED' | 'OPEN' | 'HALF_OPEN';
 
@@ -44,8 +45,11 @@ export class CircuitBreaker {
       this.onSuccess(breaker, key);
       return result;
     } catch (error) {
-      this.onFailure(breaker, key);
-      throw error;
+      if (!(error instanceof NonRetryableError)) {
+        this.onFailure(breaker, key);
+      } 
+      
+      throw (error instanceof NonRetryableError ? (error.original ?? error) : error);
     }
   }
 

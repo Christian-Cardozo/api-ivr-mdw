@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, NotFoundException, Req, RequestTimeoutException } from '@nestjs/common';
 import { MulesoftCustomerMsService } from './mulesoft-customer-ms.service';
 import { MessagePattern } from '@nestjs/microservices';
 
@@ -12,7 +12,7 @@ export class MulesoftCustomerMsController {
   }
 
   @MessagePattern('get-by-dni')
-  async getCustomerByDNI(dni:string): Promise<string> {
+  async getCustomerByDNI(dni:string): Promise<string> {    
     return this.mulesoftCustomerMsService.getByDNI(dni);
   }
 }

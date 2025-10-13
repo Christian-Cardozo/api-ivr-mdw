@@ -1,7 +1,7 @@
-import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { Catch, HttpException, Inject, Injectable } from '@nestjs/common';
 import { AuthClientService } from '@app/auth-client';
-import { ClientProxy } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { catchError, Observable, throwError } from 'rxjs';
 
 @Injectable()
 export class MulesoftService {
@@ -12,15 +12,11 @@ export class MulesoftService {
   ) { }
 
   getMulesoftCustomerByANI(ani: string): Observable<string> {
-
     return this.mulesoftClient.send<string, string>('get-by-ani', ani);
-
   }
 
   getMulesoftCustomerByDNI(dni: string): Observable<string> {
-
-    return this.mulesoftClient.send<string, string>('get-by-dni', dni);
-
+    return this.mulesoftClient.send<string, string>('get-by-dni', dni)
   }
 
   async getMulesoftCancellationAccept(params: any, body: any) {

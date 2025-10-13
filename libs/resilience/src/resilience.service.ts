@@ -1,5 +1,6 @@
 import { Injectable, Logger, RequestTimeoutException } from '@nestjs/common';
 import { CircuitBreaker } from './circuit-breaker';
+import { NonRetryableError } from 'libs/common/errors';
 
 export interface RetryConfig {
     maxRetries?: number; // Número de reintentos
@@ -59,7 +60,7 @@ export class ResilienceService {
 
                 if (!retryOn(error)) {
                     this.logger.warn(`❌ Error no reintentable para ${key}`);
-                    throw error;
+                    throw new NonRetryableError(error);
                 }
 
                 if (attempt === maxRetries) {
