@@ -20,6 +20,8 @@ import { MulesoftService } from './mulesoft.service';
           options: {
             host: config.get<string>('MULESOFT_CUSTOMER_MS_HOST', 'localhost'),
             port: config.get<number>('MULESOFT_CUSTOMER_MS_PORT', 3001),
+            retryAttempts: 10,
+            retryDelay: 3000,
           },
         }),
       },

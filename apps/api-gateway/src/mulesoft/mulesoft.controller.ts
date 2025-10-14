@@ -22,21 +22,18 @@ export class MulesoftController {
     return this.mulesoftService.getMulesoftCustomerByDNI(dni);    
   }
 
-  @Post('cancellation-process-accept')
-  getMulesoftCancellationAccept(
-    @Query() params: { xcorrelationid?: string; currentapplication?: string; currentcomponent?: string },
+  @Post('cancellation-process')
+  getMulesoftCancellation(
+    @Query() params: { 
+      xcorrelationid?: string; 
+      currentapplication?: string; 
+      currentcomponent?: string;
+      action: 'accept'|'reject';
+     },
     @Body() body: any    
   ) {
-    return this.mulesoftService.getMulesoftCancellationAccept(params, body);
-  }
-
-  @Get('cancellation-process-reject')
-  getMulesoftCancellationReject(
-    @Query() params: { xcorrelationid?: string; currentapplication?: string; currentcomponent?: string },
-    @Body() body: any
-  ) {
-    return this.mulesoftService.getMulesoftCancellationReject(params, body);
-  }
+    return this.mulesoftService.getMulesoftCancellation(params, body);
+  }  
 
   @Get('customer-bill-managment')
   getMulesoftCustomerBill() {
