@@ -7,8 +7,17 @@ import { ConfigService } from '@nestjs/config';
 export class MulesoftCustomerMsService {
   private readonly logger = new Logger(MulesoftCustomerMsService.name);
   private readonly baseUrl: string;
-  private readonly clientId: string;  
+  private readonly clientId: string;
   private readonly ResilienceConfig: ResilienceConfig;
+
+  private ROUTES_TO_DELETE: string[][] = [
+    ['accounts', 'billingAddress'],
+    ['subscriptions', 'serviceAccount'],
+    ['subscriptions', 'mainProduct', 'productSpecification', 'externalReferences'],
+    ['subscriptions', 'mainProduct', 'serviceAccount'],
+    ['subscriptions', 'mainProduct', 'customer'],
+    ['subscriptions', 'customer'],
+  ];
 
   constructor(
     private readonly authService: AuthClientService,
@@ -16,7 +25,7 @@ export class MulesoftCustomerMsService {
     private readonly configService: ConfigService,
   ) {
     this.baseUrl = this.configService.get<string>('MULE_BASE_URL') || '';
-    this.clientId = this.configService.get<string>('MULE_CLIENT_ID') || '';        
+    this.clientId = this.configService.get<string>('MULE_CLIENT_ID') || '';
 
     this.ResilienceConfig = {
       maxRetries: this.configService.get<number>('MULE_RETRIES', 3),
@@ -43,8 +52,7 @@ export class MulesoftCustomerMsService {
   async getByDNI(dni: string) {
     const url = `${this.baseUrl}/api/v1/customer?excludeNulls=true&deepLevel=3&documentType=DNI&documentNumber=${dni}`;
 
-    //console.log(this.ResilienceConfig)
-        
+    //console.log(this.ResilienceConfig)    
     return this.resilience.execute(
       'mule:getByDNI',
       (signal) => this.fetchCustomer(url, signal),
@@ -81,7 +89,15 @@ export class MulesoftCustomerMsService {
         );
       }
 
-      return response.json();
+      const body = await response.json();
+
+      // 🧹 limpiar campos como en PHP
+      const pruned = this.prunePathsInPlace(body, this.ROUTES_TO_DELETE);
+
+      // Si querés emular EXACTO el PHP, devolvé string:
+      // return JSON.stringify(pruned, undefined, 2);
+      //return pruned;
+      return body;
 
     } catch (error) {
       // 👈 Si es AbortError (timeout), convertir a RequestTimeoutException
@@ -133,4 +149,38 @@ export class MulesoftCustomerMsService {
     // ✅ Por defecto, reintentar
     return true;
   }
+
+  private deletePath(node: any, path: string[]): void {
+    if (!node || path.length === 0) return;
+
+    if (Array.isArray(node)) {
+      for (const el of node) this.deletePath(el, path);
+      return;
+    }
+    if (typeof node !== 'object') return;
+
+    if (path.length === 1) {
+      delete (node as Record<string, unknown>)[path[0]];
+      return;
+    }
+
+    const [key, ...rest] = path;
+    const next = (node as any)[key];
+    if (next == null) return;
+
+    if (Array.isArray(next)) {
+      for (const sub of next) this.deletePath(sub, rest);
+    } else if (typeof next === 'object') {
+      this.deletePath(next, rest);
+    }
+  }
+
+  private prunePathsInPlace(root: any, paths: string[][]): void {
+  if (Array.isArray(root)) {
+    for (const item of root) for (const p of paths) this.deletePath(item, p);
+  } else if (root && typeof root === 'object') {
+    for (const p of paths) this.deletePath(root, p);
+  }
+}
+
 }
