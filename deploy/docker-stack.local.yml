@@ -29,8 +29,18 @@ services:
         order: start-first
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.api-gateway.rule=Host(`local.api-ivr-mdw`)"
-        - "traefik.http.routers.api-gateway.entrypoints=web"
+        
+        # HTTP (7000)
+        - "traefik.http.routers.api-gateway-http.rule=Host(`local.api-ivr-mdw`)"
+        - "traefik.http.routers.api-gateway-http.entrypoints=web"
+        - "traefik.http.routers.api-gateway-http.service=api-gateway"
+
+        # HTTPS (7443)
+        - "traefik.http.routers.api-gateway-https.rule=Host(`local.api-ivr-mdw`)"
+        - "traefik.http.routers.api-gateway-https.entrypoints=websecure"
+        - "traefik.http.routers.api-gateway-https.tls=true"        
+        - "traefik.http.routers.api-gateway-https.service=api-gateway" 
+
         - "traefik.http.services.api-gateway.loadbalancer.server.port=3000"
         - "traefik.docker.network=traefik-public"
     healthcheck:
