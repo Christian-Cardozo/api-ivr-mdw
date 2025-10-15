@@ -1,12 +1,43 @@
 import { Controller, Get } from '@nestjs/common';
-import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
+import { RedisOptions, TcpClientOptions, Transport } from '@nestjs/microservices';
+import {
+  HealthCheck,
+  HealthCheckResult,
+  HealthCheckService,
+  MemoryHealthIndicator,
+  MicroserviceHealthIndicator
+} from '@nestjs/terminus';
 
 @Controller('health')
 export class HealthController {
 
-  constructor(private hc: HealthCheckService) { }
-  
+  constructor(
+    private healthService: HealthCheckService,
+    private msHealth: MicroserviceHealthIndicator,
+    private memory: MemoryHealthIndicator,
+  ) { }
+
   @Get()
   @HealthCheck()
-  check() { return this.hc.check([]); } // luego podés sumar checks (redis, etc.)
+  check(): Promise<HealthCheckResult> {
+
+    return this.healthService.check([
+      async () =>
+        this.msHealth.pingCheck<TcpClientOptions>('mulesoft-customer-ms', {
+          transport: Transport.TCP,
+          //options: { host: 'mulesoft-customer-ms', port: 3001 },
+          options: { host: 'localhost', port: 3001 },
+        }),
+      async () =>
+        this.msHealth.pingCheck<RedisOptions>('redis', {
+          transport: Transport.REDIS,
+          options: {
+            host: 'localhost',
+            port: 6379,
+          },
+        }),
+      async () => this.memory.checkHeap('memory_heap', 200 * 1024 * 1024),
+      async () => this.memory.checkRSS('memory_rss', 3000 * 1024 * 1024),
+    ])
+  }
 }

@@ -9,3 +9,4 @@
 - (ci) agregar reglas de deploy si se modificaron
 - ✅(mule-ms) agregar logica de depurado de response como esta actualmente en la api
 - (all) agregar validationpipes para los params recibidos desde el cliente
+- (env) validar que variables se definen como entorno y cuales simplemente se harcodean
