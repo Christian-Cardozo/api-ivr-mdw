@@ -1,33 +1,34 @@
 import { Injectable, Logger, RequestTimeoutException } from '@nestjs/common';
-import { CircuitBreaker } from './circuit-breaker';
-import { NonRetryableError } from 'libs/common/errors';
-
-export interface RetryConfig {
-    maxRetries?: number; // Número de reintentos
-    retryDelayMs?: number; // Retardo entre reintentos en milisegundos
-    timeoutMs?: number; // Tiempo máximo de espera para la operación en milisegundos
-    retryOn?: (error: any) => boolean; // Función para determinar si se debe reintentar según el error
-}
+import { CircuitBreakerService } from './circuit-breaker/circuit-breaker.service';
+import { NonRetryableError } from '@app/common/errors';
+import { ResilienceConfig } from './resilience.interface';
 
 @Injectable()
 export class ResilienceService {
 
-    private readonly logger = new Logger(ResilienceService.name);
-    private readonly breaker = new CircuitBreaker({ failureThreshold: 3, resetTimeoutMs: 15000 });
+    private readonly logger = new Logger(ResilienceService.name);        
+
+    constructor(private readonly circuitBreakerService: CircuitBreakerService){}
 
     async execute<T>(
         key: string,
         fn: (signal?: AbortSignal) => Promise<T>,
-        config: RetryConfig = {}
+        config: ResilienceConfig = {}
     ): Promise<T> {
-        return this.breaker.execute(key, () => this.executeWithRetry(key, fn, config));
+
+        if(config.circuitBreakerEnabled) {
+            return this.circuitBreakerService.execute(key, () => this.executeWithRetry(key, fn, config));
+        }
+        else {
+            return this.executeWithRetry(key, fn, config);
+        }        
     }
 
 
     async executeWithRetry<T>(
         key: string,
         fn: (signal?: AbortSignal) => Promise<T>,
-        config: RetryConfig = {}
+        config: ResilienceConfig = {}
     ): Promise<T> {
 
         const {

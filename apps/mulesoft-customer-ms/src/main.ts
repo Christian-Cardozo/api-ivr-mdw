@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { MulesoftCustomerMsModule } from './mulesoft-customer-ms.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { HttpToRpcFilter } from 'libs/common/http-to-rcp.filter';
+import { HttpToRpcFilter } from '@app/common/http-to-rcp.filter';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(

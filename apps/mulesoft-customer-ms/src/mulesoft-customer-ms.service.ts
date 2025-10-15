@@ -1,6 +1,5 @@
 import { AuthClientService } from '@app/auth-client';
-import { ResilienceService, RetryConfig } from '@app/resilience';
-import { Retry } from '@app/resilience/retry.decorator';
+import { ResilienceService, ResilienceConfig } from '@app/resilience';
 import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -8,11 +7,8 @@ import { ConfigService } from '@nestjs/config';
 export class MulesoftCustomerMsService {
   private readonly logger = new Logger(MulesoftCustomerMsService.name);
   private readonly baseUrl: string;
-  private readonly clientId: string;
-  private readonly timeout: number;
-  private readonly maxRetries: number;
-  private readonly retryDelayMs: number;
-  private readonly retryConfig: RetryConfig;
+  private readonly clientId: string;  
+  private readonly ResilienceConfig: ResilienceConfig;
 
   constructor(
     private readonly authService: AuthClientService,
@@ -20,15 +16,13 @@ export class MulesoftCustomerMsService {
     private readonly configService: ConfigService,
   ) {
     this.baseUrl = this.configService.get<string>('MULE_BASE_URL') || '';
-    this.clientId = this.configService.get<string>('MULE_CLIENT_ID') || '';
-    this.timeout = this.configService.get<number>('MULE_TIMEOUT_MS', 100);
-    this.maxRetries = this.configService.get<number>('MULE_RETRIES', 3);
-    this.retryDelayMs = this.configService.get<number>('MULE_RETRY_DELAY_MS', 1000);
+    this.clientId = this.configService.get<string>('MULE_CLIENT_ID') || '';        
 
-    this.retryConfig = {
-      maxRetries: this.maxRetries,
-      timeoutMs: this.timeout,
-      retryDelayMs: this.retryDelayMs,
+    this.ResilienceConfig = {
+      maxRetries: this.configService.get<number>('MULE_RETRIES', 3),
+      timeoutMs: this.configService.get<number>('MULE_TIMEOUT_MS', 100),
+      retryDelayMs: this.configService.get<number>('MULE_RETRY_DELAY_MS', 1000),
+      circuitBreakerEnabled: this.configService.get<boolean>('MULE_CB_ENABLED') || false,
       retryOn: (error) => this.shouldRetry(error),
     };
   }
@@ -41,18 +35,20 @@ export class MulesoftCustomerMsService {
     return this.resilience.execute(
       'mule:getByANI',
       (signal) => this.fetchCustomer(url, signal),
-      this.retryConfig,
+      this.ResilienceConfig,
     );
   }
 
-  //@Retry('mule:getByDNI')
+  //@Resilience('mule:getByDNI')
   async getByDNI(dni: string) {
     const url = `${this.baseUrl}/api/v1/customer?excludeNulls=true&deepLevel=3&documentType=DNI&documentNumber=${dni}`;
 
+    //console.log(this.ResilienceConfig)
+        
     return this.resilience.execute(
       'mule:getByDNI',
       (signal) => this.fetchCustomer(url, signal),
-      this.retryConfig,
+      this.ResilienceConfig,
     );
   }
 

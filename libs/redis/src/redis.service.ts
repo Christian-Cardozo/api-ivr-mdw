@@ -10,10 +10,17 @@ interface TokenData {
 export class RedisService implements OnModuleDestroy {
   private readonly logger = new Logger(RedisService.name);
 
-  constructor(@Inject('REDIS_CLIENT') private readonly redis: Redis) {}
+  constructor(@Inject('REDIS_CLIENT') private readonly redis: Redis) { }
 
   async onModuleDestroy() {
     await this.redis.quit();
+  }
+
+  /**
+  * Expone el cliente ioredis subyacente para operaciones avanzadas (MULTI/EXEC, etc.)
+  */
+  public getRedisClient(): Redis {
+    return this.redis;
   }
 
   /**

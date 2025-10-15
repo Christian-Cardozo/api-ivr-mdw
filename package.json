@@ -85,6 +85,7 @@
     ],
     "moduleNameMapper": {
       "^@app/auth-client(|/.*)$": "<rootDir>/libs/auth-client/src/$1",
+      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
       "^@app/config(|/.*)$": "<rootDir>/libs/config/src/$1",
       "^@app/redis(|/.*)$": "<rootDir>/libs/redis/src/$1",
       "^@app/resilience(|/.*)$": "<rootDir>/libs/resilience/src/$1",

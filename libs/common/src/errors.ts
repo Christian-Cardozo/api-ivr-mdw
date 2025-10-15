@@ -4,3 +4,10 @@ export class NonRetryableError extends Error {
     this.name = 'NonRetryableError';
   }
 }
+
+export class CircuitOpenError extends Error {
+  constructor(public key: string) {
+    super(`Circuit breaker OPEN for ${key}`);
+    this.name = 'CircuitOpenError';
+  }
+}

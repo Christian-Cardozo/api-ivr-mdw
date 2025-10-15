@@ -28,6 +28,12 @@
       "@app/auth-client/*": [
         "libs/auth-client/src/*"
       ],
+      "@app/common": [
+        "libs/common/src"
+      ],
+      "@app/common/*": [
+        "libs/common/src/*"
+      ],
       "@app/config": [
         "libs/config/src"
       ],
