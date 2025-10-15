@@ -44,12 +44,12 @@ services:
         - "traefik.enable=true"
 
         # HTTP (7000)
-        - "traefik.http.routers.api-gateway-http.rule=Host(`gestionivr.${HOST}.corp.cloudteco.com.ar`) || Host(`api-ivr1`) || Host(`api-ivr2`)"
+        - "traefik.http.routers.api-gateway-http.rule=Host(`${HOST}.corp.cloudteco.com.ar`) || Host(`api-ivr1`) || Host(`api-ivr2`)"
         - "traefik.http.routers.api-gateway-http.entrypoints=web"
         - "traefik.http.routers.api-gateway-http.service=api-gateway"
 
         # HTTPS (7443)
-        - "traefik.http.routers.api-gateway-https.rule=Host(`gestionivr.${HOST}.corp.cloudteco.com.ar`) || Host(`api-ivr1`) || Host(`api-ivr2`)"
+        - "traefik.http.routers.api-gateway-https.rule=Host(`${HOST}.corp.cloudteco.com.ar`) || Host(`api-ivr1`) || Host(`api-ivr2`)"
         - "traefik.http.routers.api-gateway-https.entrypoints=websecure"
         - "traefik.http.routers.api-gateway-https.tls=true"
         - "traefik.http.routers.api-gateway-https.service=api-gateway"
