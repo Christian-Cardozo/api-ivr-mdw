@@ -28,8 +28,8 @@ export class MulesoftCustomerMsService {
     this.clientId = this.configService.get<string>('MULE_CLIENT_ID') || '';
 
     this.ResilienceConfig = {
-      maxRetries: this.configService.get<number>('MULE_RETRIES', 3),
-      timeoutMs: this.configService.get<number>('MULE_TIMEOUT_MS', 100),
+      maxRetries: this.configService.get<number>('MULE_RETRIES', 2),
+      timeoutMs: this.configService.get<number>('MULE_TIMEOUT_MS', 5000),
       retryDelayMs: this.configService.get<number>('MULE_RETRY_DELAY_MS', 1000),
       circuitBreakerEnabled: this.configService.get<boolean>('MULE_CB_ENABLED') || false,
       retryOn: (error) => this.shouldRetry(error),
