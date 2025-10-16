@@ -32,7 +32,7 @@ export class MulesoftService {
     const { xcorrelationid, currentApplication, currentComponent, action } = params;
     const url = `${this.cancelBaseUrl}/api/v1/retention/${action}`;
     const client = this.clientId;
-    const token = this.authService.getToken();
+    const token = await this.authService.getToken();
 
 
     const headers: Record<string, string> = {

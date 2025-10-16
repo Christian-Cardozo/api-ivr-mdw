@@ -2,97 +2,135 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# 🧩 api-ivr-mdw
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+**api-ivr-mdw** es un *middleware* desarrollado para integrar sistemas IVR (*Interactive Voice Response*) con servicios corporativos en la nube mediante una arquitectura de **microservicios escalables y resilientes**.
 
-## Description
+Su propósito es **conectar, orquestar y asegurar la comunicación** entre múltiples APIs externas (como Mulesoft, Redis, y servicios internos), garantizando tolerancia a fallos y estabilidad ante errores o latencias de red mediante un completo **motor de resiliencia**.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## 🚀 Características principales
 
-```bash
-$ pnpm install
+- **Arquitectura modular (NestJS monorepo):** apps independientes como `api-gateway`, `mulesoft-customer-ms`, y librerías compartidas (`auth-client`, `redis-client`, `resilience`, `xml`, etc.).  
+- **Resilience Layer integrada:** circuit breaker, retry, timeout, backoff, y manejo de errores no reintentables.  
+- **Integración con Mulesoft APIs:** permite gestionar información de clientes (por ANI o DNI) y otros procesos IVR.  
+- **Cache distribuido con Redis:** para almacenamiento temporal de tokens, respuestas y estados de circuitos.  
+- **Orquestación en Docker Swarm:** despliegue automatizado multiambiente (`dev`, `preprod`, `prod`) con **Traefik v3** como reverse proxy.  
+- **Observabilidad completa:** métricas y dashboards vía **Prometheus**, **Grafana** y **Dynatrace**.  
+
+---
+
+## 🏗️ Arquitectura general
+
+```mermaid
+graph TD
+  A[IVR System] -->|Requests| B(API Gateway)
+  B --> C[Mulesoft Customer MS]
+  B --> D[Redis Cache]
+  C --> E[External Cloud APIs]
+  B --> F[Resilience Layer]
+  F -->|Circuit Breaker / Retry| C
 ```
 
-## Compile and run the project
+---
+
+## ⚙️ Instalación
 
 ```bash
-# development
-$ pnpm run start
+# Clonar el repositorio
+git clone https://gitlab.com/telecom-argentina/cio/canalesdigitales/pic/backend/ivr-evolution/api-ivr-mdw.git
+cd api-ivr-mdw
 
-# watch mode
-$ pnpm run start:dev
+# Instalar dependencias (usa pnpm para monorepos)
+pnpm install
 
-# production mode
-$ pnpm run start:prod
+# Iniciar entorno de desarrollo local - 1 terminal para cada app
+pnpm run start:dev (app)
+pnpm run start:dev api-gateway
+pnpm run start:dev mulesoft-customer-ms
+
 ```
+---
 
-## Run tests
+## 🐳 Despliegue en Docker Swarm localmente
+
+El proyecto está diseñado para ejecutarse dentro de un **cluster Swarm** con balanceo y TLS vía **Traefik**.
+
+Es requisito tener instalado Docker Desktop (Windows) o docker
 
 ```bash
-# unit tests
-$ pnpm run test
+# Iniciar el swarm
+docker swarm init
 
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+# Desplegar stack
+cd deploy
+docker stack deploy -c docker-stack.yml api-ivr-mdw
 ```
 
-## Deployment
+> Dentro de deploy en necesario crear un archivo de variables de entorno (`.env`)
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+---
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## 🐳 Despliegue en Docker Compose localmente
+
+El proyecto puede ejecutarse alternativamente mediante docker compose
+
+Es requisito tener instalado Docker Desktop (Windows) o docker
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+# Desplegar en compose
+cd deploy
+docker compose up -d
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+> Dentro de deploy en necesario crear un archivo de variables de entorno (`.env`)
+---
 
-## Resources
+## 🧠 Resilience Layer
 
-Check out a few resources that may come in handy when working with NestJS:
+El módulo de resiliencia gestiona automáticamente fallos temporales mediante:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- **Circuit Breaker:** evita cascadas de errores cuando un servicio externo falla repetidamente.  
+- **Retry con Backoff exponencial:** reintenta operaciones de forma controlada.  
+- **Timeouts configurables:** limita tiempos de espera por servicio.  
+- **Fallback opcional:** permite definir respuestas por defecto ante errores.  
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 📊 Observabilidad (WIP)
 
-## Stay in touch
+Cada microservicio expone un endpoint `/metrics` compatible con **Prometheus**.  
+El stack puede integrarse fácilmente con **Grafana** o **Dynatrace** para análisis en tiempo real.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
 
-## License
+## 🧩 Estructura del repositorio
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```
+apps/
+  ├─ api-gateway/
+  ├─ mulesoft-customer-ms/
+libs/
+  ├─ auth-client/
+  ├─ redis-client/
+  ├─ resilience/
+  ├─ xml/
+  └─ common/
+```
+
+---
+
+## 🤝 Contribuciones
+
+1. Forkeá el repo  
+2. Creá una rama de feature (`feat/nueva-funcionalidad`)  
+3. Hacé commit claro y semántico  
+4. Abrí un Pull Request  
+
+---
+
+## 📜 Licencia
+
+Este proyecto está bajo la licencia **MIT**.  
+© 2025 [Christian Cardozo](https://github.com/Christian-Cardozo)
