@@ -7,6 +7,8 @@ import {
   MemoryHealthIndicator,
   MicroserviceHealthIndicator
 } from '@nestjs/terminus';
+import { ConfigService } from '@nestjs/config';
+
 
 @Controller('health')
 export class HealthController {
@@ -15,6 +17,7 @@ export class HealthController {
     private healthService: HealthCheckService,
     private msHealth: MicroserviceHealthIndicator,
     private memory: MemoryHealthIndicator,
+    private configService:ConfigService,
   ) { }
 
   @Get()
@@ -25,15 +28,17 @@ export class HealthController {
       async () =>
         this.msHealth.pingCheck<TcpClientOptions>('mulesoft-customer-ms', {
           transport: Transport.TCP,
-          //options: { host: 'mulesoft-customer-ms', port: 3001 },
-          options: { host: 'localhost', port: 3001 },
+          options: { 
+            host: this.configService.get<string>('MULESOFT_CUSTOMER_MS_HOST') || 'localhost', 
+            port: this.configService.get<number>('MULESOFT_CUSTOMER_MS_PORT') || 3001 , 
+          },          
         }),
       async () =>
         this.msHealth.pingCheck<RedisOptions>('redis', {
           transport: Transport.REDIS,
           options: {
-            host: 'localhost',
-            port: 6379,
+            host: this.configService.get<string>('REDIS_HOST') || 'localhost',            
+            port: this.configService.get<number>('REDIS_PORT') || 6379,
           },
         }),
       async () => this.memory.checkHeap('memory_heap', 200 * 1024 * 1024),
