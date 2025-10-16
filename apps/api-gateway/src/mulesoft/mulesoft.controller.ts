@@ -1,6 +1,7 @@
 import { Body, Controller, Get, HttpException, Param, Post, Query } from '@nestjs/common';
 import { MulesoftService } from './mulesoft.service';
 import { XmlResponse } from '@app/xml/xml-response.decorator';
+import { AniParamDto, DniParamDto } from './dtos/mulesoft.customer.dto';
 
 @Controller('mulesoft')
 export class MulesoftController {
@@ -9,7 +10,7 @@ export class MulesoftController {
   @Get('customer-management-ani/:ani')
   @XmlResponse()
   async getMulesoftCustomerByANI(
-    @Param('ani') ani: string
+    @Param() { ani }: AniParamDto
   ) {
     return this.mulesoftService.getMulesoftCustomerByANI(ani);
   }
@@ -17,23 +18,23 @@ export class MulesoftController {
   @Get('customer-management-dni/:dni')
   @XmlResponse()
   async getMulesoftCustomerByDNI(
-    @Param('dni') dni: string    
-  ) {  
-    return this.mulesoftService.getMulesoftCustomerByDNI(dni);    
+    @Param() { dni }: DniParamDto
+  ) {
+    return this.mulesoftService.getMulesoftCustomerByDNI(dni);
   }
 
   @Post('cancellation-process')
   getMulesoftCancellation(
-    @Query() params: { 
-      xcorrelationid?: string; 
-      currentapplication?: string; 
+    @Query() params: {
+      xcorrelationid?: string;
+      currentapplication?: string;
       currentcomponent?: string;
-      action: 'accept'|'reject';
-     },
-    @Body() body: any    
+      action: 'accept' | 'reject';
+    },
+    @Body() body: any
   ) {
     return this.mulesoftService.getMulesoftCancellation(params, body);
-  }  
+  }
 
   @Get('customer-bill-managment')
   getMulesoftCustomerBill() {

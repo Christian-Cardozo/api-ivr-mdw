@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { ApiGatewayModule } from './api-gateway.module';
-import { Logger, RequestMethod } from '@nestjs/common';
+import { Logger, RequestMethod, ValidationPipe } from '@nestjs/common';
 import { RpcToHttpInterceptor } from '@app/common/rpc-to-http.interceptor';
 
 async function bootstrap() {
@@ -10,11 +10,13 @@ async function bootstrap() {
   // Inyección del ConfigService global
   const configService = app.get(ConfigService);
   const logger = new Logger('Api-Gateway');
-  
+
   app.setGlobalPrefix('api/ivr-mdw', {
     exclude: [{ path: 'health', method: RequestMethod.GET }],
   });
 
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }));
+  
   // Puerto y host desde env/config
   const port = configService.get<number>('APP_PORT', 3000);
   const host = configService.get<string>('APP_HOST', '0.0.0.0');
