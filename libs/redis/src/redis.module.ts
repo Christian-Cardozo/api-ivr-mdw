@@ -1,4 +1,4 @@
-import { Module, Global } from '@nestjs/common';
+import { Module, Global, Logger } from '@nestjs/common';
 import { RedisService } from './redis.service';
 import { GlobalConfigModule } from '@app/config';
 import { ConfigService } from '@nestjs/config';
@@ -12,19 +12,38 @@ import { ConfigService } from '@nestjs/config';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const Redis = require('ioredis');
+        const logger = new Logger('RedisModule');
         const host = config.get<string>('REDIS_HOST', 'localhost');
-        const port = config.get<number>('REDIS_PORT', 6379);        
+        const port = config.get<number>('REDIS_PORT', 6379);
 
-        return new Redis({
+        const client = new Redis({
           host,
-          port,          
+          port,
           maxRetriesPerRequest: 3,
-          retryStrategy: (times:number) => Math.min(times * 50, 2000),
+          retryStrategy: (times: number) => Math.min(times * 50, 2000),
         });
+
+        client.on('connect', () => {
+          logger.log(`Connected to Redis at ${host}:${port}`);
+        });
+
+        client.on('reconnecting', () => {
+          logger.warn('Reconnecting to Redis...');
+        });
+
+        client.on('end', () => {
+          logger.warn('Redis connection closed.');
+        });
+
+        client.on('error', (err: Error) => {
+          logger.error(`Redis connection error: ${err.message}`);
+        });
+
+        return client;
       },
     },
     RedisService,
   ],
   exports: [RedisService],
 })
-export class RedisModule {}
+export class RedisModule { }
