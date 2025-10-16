@@ -3,9 +3,9 @@
 - ✅ (deploy) ajustar los stack segun el servicio. ej variables de mule no van en api 
 - ✅ (mule-ms) agregar la logia de corte y reintentos
 - ✅ (deploy) agregar traefik
-- (docs) configurar correctamente el readme
-- (docs) agregar documentacion del proceso y/o codigo
-- (test) agregar unit test si sirve
+- ✅(docs) configurar correctamente el readme
+- ❌(docs) agregar documentacion del proceso y/o codigo --> se posterga el swagger. se considera confluence
+- ✅(test) agregar unit test si sirve
 - ❌(ci) agregar reglas de deploy si se modificaron --> no es relevante
 - ✅(mule-ms) agregar logica de depurado de response como esta actualmente en la api
 - ✅(all) agregar validationpipes para los params recibidos desde el cliente
