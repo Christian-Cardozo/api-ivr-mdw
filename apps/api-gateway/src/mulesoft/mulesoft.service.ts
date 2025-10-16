@@ -17,7 +17,7 @@ export class MulesoftService {
     @Inject('MULESOFT_CUSTOMER_MS') private readonly mulesoftClient: ClientProxy,
   ) { 
     this.cancelBaseUrl = this.configService.get<string>('MULESOFT_CANCEL_BASE_URL') || '';
-    this.clientId = this.configService.get<string>('MULE_CLIENT_ID') || '';
+    this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
   }
 
   getMulesoftCustomerByANI(ani: string): Observable<string> {

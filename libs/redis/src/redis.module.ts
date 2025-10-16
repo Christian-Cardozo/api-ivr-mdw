@@ -13,15 +13,13 @@ import { ConfigService } from '@nestjs/config';
       useFactory: (config: ConfigService) => {
         const Redis = require('ioredis');
         const host = config.get<string>('REDIS_HOST', 'localhost');
-        const port = config.get<number>('REDIS_PORT', 6379);
-        const password = config.get<string>('REDIS_PASSWORD');
+        const port = config.get<number>('REDIS_PORT', 6379);        
 
         return new Redis({
           host,
-          port,
-          password,
+          port,          
           maxRetriesPerRequest: 3,
-          retryStrategy: (times) => Math.min(times * 50, 2000),
+          retryStrategy: (times:number) => Math.min(times * 50, 2000),
         });
       },
     },
