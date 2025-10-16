@@ -2,6 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MulesoftController } from '../mulesoft.controller';
 import { MulesoftService } from '../mulesoft.service';
 import { of } from 'rxjs';
+import { MulesoftController } from '../mulesoft.controller';
+import { MulesoftService } from '../mulesoft.service';
+import { of } from 'rxjs';
 
 describe('MulesoftController', () => {
   let controller: MulesoftController;
@@ -10,8 +13,17 @@ describe('MulesoftController', () => {
     getMulesoftCustomerByDNI: jest.fn(),
     getMulesoftCancellation: jest.fn(),
   } as jest.Mocked<Pick<MulesoftService, 'getMulesoftCustomerByANI' | 'getMulesoftCustomerByDNI' | 'getMulesoftCancellation'>>;
+  const serviceMock = {
+    getMulesoftCustomerByANI: jest.fn(),
+    getMulesoftCustomerByDNI: jest.fn(),
+    getMulesoftCancellation: jest.fn(),
+  } as jest.Mocked<Pick<MulesoftService, 'getMulesoftCustomerByANI' | 'getMulesoftCustomerByDNI' | 'getMulesoftCancellation'>>;
 
   beforeEach(async () => {
+    serviceMock.getMulesoftCustomerByANI.mockReset();
+    serviceMock.getMulesoftCustomerByDNI.mockReset();
+    serviceMock.getMulesoftCancellation.mockReset();
+
     serviceMock.getMulesoftCustomerByANI.mockReset();
     serviceMock.getMulesoftCustomerByDNI.mockReset();
     serviceMock.getMulesoftCancellation.mockReset();

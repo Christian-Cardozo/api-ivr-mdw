@@ -5,9 +5,37 @@ import { AuthClientService } from '@app/auth-client';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
 import { of } from 'rxjs';
+import { HttpException } from '@nestjs/common';
+import { MulesoftService } from '../mulesoft.service';
+import { AuthClientService } from '@app/auth-client';
+import { ConfigService } from '@nestjs/config';
+import { ClientProxy } from '@nestjs/microservices';
+import { of } from 'rxjs';
 
 describe('MulesoftService', () => {
   let service: MulesoftService;
+
+  const authServiceMock = {
+    getToken: jest.fn(),
+  } satisfies Partial<AuthClientService>;
+
+  const configServiceMock = {
+    get: jest.fn(),
+  } satisfies Partial<ConfigService>;
+
+  const clientProxyMock = {
+    send: jest.fn(),
+  } satisfies Partial<ClientProxy>;
+
+  const originalFetch = global.fetch;
+
+  beforeAll(() => {
+    (global as any).fetch = jest.fn();
+  });
+
+  afterAll(() => {
+    (global as any).fetch = originalFetch;
+  });
 
   const authServiceMock = {
     getToken: jest.fn(),
@@ -45,7 +73,26 @@ describe('MulesoftService', () => {
 
     clientProxyMock.send = jest.fn();
 
+    const configValues: Record<string, string> = {
+      MULESOFT_CANCEL_BASE_URL: 'https://mulesoft.test',
+      MULESOFT_CLIENT_ID: 'client-123',
+    };
+
+    configServiceMock.get = jest
+      .fn()
+      .mockImplementation((key: string) => configValues[key]);
+
+    authServiceMock.getToken = jest.fn().mockResolvedValue('token-xyz');
+
+    clientProxyMock.send = jest.fn();
+
     const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        MulesoftService,
+        { provide: AuthClientService, useValue: authServiceMock },
+        { provide: ConfigService, useValue: configServiceMock },
+        { provide: 'MULESOFT_CUSTOMER_MS', useValue: clientProxyMock },
+      ],
       providers: [
         MulesoftService,
         { provide: AuthClientService, useValue: authServiceMock },

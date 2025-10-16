@@ -24,7 +24,25 @@ describe('HealthController', () => {
     checkRSS: jest.fn(),
   } as unknown as jest.Mocked<MemoryHealthIndicator>;
 
+  const healthServiceMock = {
+    check: jest.fn(),
+  } as unknown as jest.Mocked<HealthCheckService>;
+
+  const microserviceHealthMock = {
+    pingCheck: jest.fn(),
+  } as unknown as jest.Mocked<MicroserviceHealthIndicator>;
+
+  const memoryHealthMock = {
+    checkHeap: jest.fn(),
+    checkRSS: jest.fn(),
+  } as unknown as jest.Mocked<MemoryHealthIndicator>;
+
   beforeEach(async () => {
+    healthServiceMock.check = jest.fn();
+    microserviceHealthMock.pingCheck = jest.fn();
+    memoryHealthMock.checkHeap = jest.fn();
+    memoryHealthMock.checkRSS = jest.fn();
+
     healthServiceMock.check = jest.fn();
     microserviceHealthMock.pingCheck = jest.fn();
     memoryHealthMock.checkHeap = jest.fn();
@@ -32,6 +50,11 @@ describe('HealthController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [HealthController],
+      providers: [
+        { provide: HealthCheckService, useValue: healthServiceMock },
+        { provide: MicroserviceHealthIndicator, useValue: microserviceHealthMock },
+        { provide: MemoryHealthIndicator, useValue: memoryHealthMock },
+      ],
       providers: [
         { provide: HealthCheckService, useValue: healthServiceMock },
         { provide: MicroserviceHealthIndicator, useValue: microserviceHealthMock },
