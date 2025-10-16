@@ -8,7 +8,7 @@ import {
   MicroserviceHealthIndicator
 } from '@nestjs/terminus';
 
-/*@Controller('health')
+@Controller('health')
 export class HealthController {
 
   constructor(
@@ -40,4 +40,4 @@ export class HealthController {
       async () => this.memory.checkRSS('memory_rss', 3000 * 1024 * 1024),
     ])
   }
-}*/
+}
