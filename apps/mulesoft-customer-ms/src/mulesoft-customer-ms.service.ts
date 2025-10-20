@@ -21,7 +21,7 @@ export class MulesoftCustomerMsService {
 
   constructor(
     private readonly authService: AuthClientService,
-    private readonly resilience: ResilienceService, // 👈 Inyectar ResilienceService
+    private readonly resilience: ResilienceService, 
     private readonly configService: ConfigService,
   ) {
     this.baseUrl = this.configService.get<string>('MULESOFT_CUSTOMER_BASE_URL') || '';

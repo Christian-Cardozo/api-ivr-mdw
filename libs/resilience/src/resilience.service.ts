@@ -73,7 +73,7 @@ export class ResilienceService {
                 // Jitter: Retraso aleatorio entre 0 y el valor del backoff exponencial
                 const delay = Math.round(Math.random() * baseDelay);
 
-                this.logger.warn(`⚠️ Intento ${attempt}/${maxRetries} falló para ${key}, reintentando en ${delay}ms...`);
+                this.logger.warn(`⚠️ Intento ${attempt}/${maxRetries} falló para ${key}, reason: ${lastError.message} | Reintentando en ${delay}ms...`);
                 await this.sleep(delay);
             }
         }

@@ -2,7 +2,8 @@ version: "3.8"
 
 networks:
   ivr-net:
-    driver: overlay
+    external: true
+    name: ivr-net
   traefik-public:
     external: true
     name: traefik-public 
@@ -23,7 +24,7 @@ services:
     #    mode: host
     deploy:
       mode: replicated
-      replicas: 1
+      replicas: 2
       restart_policy: { condition: any }
       update_config:
         order: start-first
@@ -42,7 +43,7 @@ services:
         - "traefik.http.routers.api-gateway-https.service=api-gateway" 
 
         - "traefik.http.services.api-gateway.loadbalancer.server.port=3000"
-        - "traefik.docker.network=traefik-public"
+        - "traefik.swarm.network=traefik-public"
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/health >/dev/null 2>&1 || exit 1"]
       interval: 30s
@@ -58,7 +59,7 @@ services:
     networks: [ivr-net]
     deploy:
       mode: replicated
-      replicas: 1
+      replicas: 5
       restart_policy: { condition: any }
 
   redis:
