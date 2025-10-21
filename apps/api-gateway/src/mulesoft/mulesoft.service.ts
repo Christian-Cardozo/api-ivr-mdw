@@ -1,7 +1,7 @@
 import { HttpException, Inject, Injectable, Logger } from '@nestjs/common';
 import { AuthClientService } from '@app/auth-client';
 import { ClientProxy } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import { catchError, firstValueFrom, Observable, of, timeout } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -10,6 +10,7 @@ export class MulesoftService {
   private readonly logger = new Logger(MulesoftService.name);
   private readonly cancelBaseUrl: string;
   private readonly clientId: string;
+  private hb?: NodeJS.Timeout;
 
   constructor(
     private readonly authService: AuthClientService,
@@ -19,6 +20,41 @@ export class MulesoftService {
     this.cancelBaseUrl = this.configService.get<string>('MULESOFT_CANCEL_BASE_URL') || '';
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
   }
+
+  async onModuleInit() {
+    await this.ensureConnected();
+    this.startHeartbeat(); // evita idle-close “silencioso”
+  }
+
+  onModuleDestroy() {
+    if (this.hb) clearInterval(this.hb);
+    this.mulesoftClient.close();
+  }
+
+  private async ensureConnected() {
+    try {
+      await this.mulesoftClient.connect();
+      this.logger.log('TCP client conectado');
+    } catch (e) {
+      this.logger.warn(`Fallo connect(): ${e?.code || e?.message}. Reintentando...`);
+      setTimeout(() => this.ensureConnected(), 1000);
+    }
+  }
+
+  private startHeartbeat() {
+    // “ping” cada 15s, timeout 5s. Si falla, forzá reconnect en el próximo send()
+    this.hb = setInterval(async () => {
+      try {
+        await firstValueFrom(
+          this.mulesoftClient.send<string, string>('ping', 'ok').pipe(
+            timeout(5000),
+            catchError(() => of('err')),
+          ),
+        );
+      } catch { /* no-op */ }
+    }, 15000);
+  }
+
 
   getMulesoftCustomerByANI(ani: string): Observable<string> {
     return this.mulesoftClient.send<string, string>('get-by-ani', ani);

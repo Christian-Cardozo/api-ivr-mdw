@@ -7,12 +7,17 @@ export class MulesoftCustomerMsController {
   constructor(private readonly mulesoftCustomerMsService: MulesoftCustomerMsService) { }
 
   @MessagePattern('get-by-ani')
-  async getCustomerByANI(ani:string): Promise<string> {
+  async getCustomerByANI(ani: string): Promise<string> {
     return this.mulesoftCustomerMsService.getByANI(ani);
   }
 
   @MessagePattern('get-by-dni')
-  async getCustomerByDNI(dni:string): Promise<string> {    
+  async getCustomerByDNI(dni: string): Promise<string> {
     return this.mulesoftCustomerMsService.getByDNI(dni);
+  }
+
+  @MessagePattern('ping')
+  ping(): string {
+    return 'pong';
   }
 }
