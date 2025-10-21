@@ -15,12 +15,13 @@ export class MulesoftController {
     return this.mulesoftService.getMulesoftCustomerByANI(ani);
   }
 
-  @Get('customer-management-dni/:dni')
+  @Get('customer-management/:type/:dni')
   @XmlResponse()
   async getMulesoftCustomerByDNI(
-    @Param() { dni }: DniParamDto
+    @Param('type') type: string,
+    @Param('dni') dni: string,
   ) {
-    return this.mulesoftService.getMulesoftCustomerByDNI(dni);
+    return this.mulesoftService.getMulesoftCustomerByDNI(type, dni);
   }
 
   @Post('cancellation-process')

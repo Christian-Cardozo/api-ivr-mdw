@@ -16,7 +16,7 @@ export class MulesoftService {
     private readonly authService: AuthClientService,
     private readonly configService: ConfigService,
     @Inject('MULESOFT_CUSTOMER_MS') private readonly mulesoftClient: ClientProxy,
-  ) { 
+  ) {
     this.cancelBaseUrl = this.configService.get<string>('MULESOFT_CANCEL_BASE_URL') || '';
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
   }
@@ -60,11 +60,11 @@ export class MulesoftService {
     return this.mulesoftClient.send<string, string>('get-by-ani', ani);
   }
 
-  getMulesoftCustomerByDNI(dni: string): Observable<string> {
-    return this.mulesoftClient.send<string, string>('get-by-dni', dni)
+  getMulesoftCustomerByDNI(type: string, dni: string): Observable<string> {
+    return this.mulesoftClient.send<string, { type: string, dni: string }>('get-by-dni', { type, dni })
   }
 
-  async getMulesoftCancellation(params: any, body: any) {    
+  async getMulesoftCancellation(params: any, body: any) {
     const { xcorrelationid, currentApplication, currentComponent, action } = params;
     const url = `${this.cancelBaseUrl}/api/v1/retention/${action}`;
     const client = this.clientId;

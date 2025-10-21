@@ -49,8 +49,8 @@ export class MulesoftCustomerMsService {
   }
 
   //@Resilience('mule:getByDNI')
-  async getByDNI(dni: string) {
-    const url = `${this.baseUrl}/api/v1/customer?excludeNulls=true&deepLevel=3&documentType=DNI&documentNumber=${dni}`;
+  async getByDNI(type:string, dni: string) {
+    const url = `${this.baseUrl}/api/v1/customer?excludeNulls=true&deepLevel=3&documentType=${type}&documentNumber=${dni}`;
 
     //console.log(this.ResilienceConfig)    
     return this.resilience.execute(
