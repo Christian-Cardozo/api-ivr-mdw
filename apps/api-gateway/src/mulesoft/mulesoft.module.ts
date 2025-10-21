@@ -22,6 +22,7 @@ import { MulesoftService } from './mulesoft.service';
             port: config.get<number>('MULESOFT_CUSTOMER_MS_PORT', 3001),
             retryAttempts: 10,
             retryDelay: 3000,
+            timeout: 60000,
           },
         }),
       },
