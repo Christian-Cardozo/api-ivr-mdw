@@ -9,7 +9,7 @@ networks:
 
 services:
   api-gateway:
-    image: ${CI_REGISTRY_IMAGE}/api-ivr-mdw/api-gateway:${IMAGE_TAG}
+    image: ${CI_REGISTRY_IMAGE}/api-gateway:${IMAGE_TAG}
     environment:
       NODE_ENV: ${NODE_ENV}
       APP_ENV:  ${APP_ENV}
@@ -61,7 +61,7 @@ services:
       start_period: 60s
 
   mulesoft-customer-ms:
-    image: ${CI_REGISTRY_IMAGE}/api-ivr-mdw/mulesoft-customer-ms:${IMAGE_TAG}
+    image: ${CI_REGISTRY_IMAGE}/mulesoft-customer-ms:${IMAGE_TAG}
     environment:
       NODE_ENV: ${NODE_ENV}
       APP_ENV:  ${APP_ENV}      
