@@ -85,7 +85,7 @@ services:
         reservations: { memory: 128M }
 
   redis:
-    image: redis:7-alpine
+    image: ${CI_REGISTRY_IMAGE}/redis:7-alpine
     networks: [ivr-net]
     deploy:
       placement:
