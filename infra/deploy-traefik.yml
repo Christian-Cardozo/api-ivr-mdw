@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+  traefik:
+    image: traefik:v3.2
+    command:
+      - "--api.dashboard=true"
+      - "--api.insecure=false"
+
+      - "--providers.swarm=true"
+      - "--providers.swarm.exposedByDefault=false"
+      - "--providers.swarm.network=traefik-public"
+      - "--providers.swarm.endpoint=unix:///var/run/docker.sock"
+
+      - "--entrypoints.web.address=:7000"
+      - "--entrypoints.websecure.address=:7443"   # <— NUEVO HTTPS
+      - "--entrypoints.traefik.address=:8080"
+
+      - "--providers.file.directory=/etc/traefik/dynamic"  # <— para certs
+      - "--providers.file.watch=true"
+
+       # --------- MÉTRICAS PROMETHEUS ---------
+      - "--entrypoints.metrics.address=:8082"
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.addEntryPointsLabels=true"
+      - "--metrics.prometheus.addServicesLabels=true"
+      - "--metrics.prometheus.entryPoint=metrics"
+
+      # --------- LOGS ---------
+      - "--log.level=INFO"
+      - "--accesslog=true"
+      - "--accesslog.format=json"   # más fácil de parsear en Dynatrace
+    ports:
+      - "7000:7000"
+      - "7001:8080"
+      - "7002:8082"
+      - "7443:7443"          # <— publicar HTTPS sin tocar 443 del host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./dynamic:/etc/traefik/dynamic:ro   # <— montás los certs
+    networks:
+      - traefik-public
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.dashboard.rule=Host(`traefik.localhost`) || PathPrefix(`/dashboard`) || PathPrefix(`/api`)"
+        - "traefik.http.routers.dashboard.entrypoints=traefik"
+        - "traefik.http.routers.dashboard.service=api@internal"
+        - "traefik.http.services.dummy.loadbalancer.server.port=8080"
+networks:
+  traefik-public:
+    external: true
+    name: traefik-public

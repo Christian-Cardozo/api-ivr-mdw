@@ -1,0 +1,28 @@
+services:
+  traefik:
+    image: traefik:v2.10
+    ports:
+      - "80:80"
+      - "8080:8080"
+    command:
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--providers.docker.swarmmode=true"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--entrypoints.web.address=:80"
+      - "--accesslog=true"
+      - "--providers.docker.exposedbydefault=false"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    networks:
+      - traefik-public
+    labels:
+      - "traefik.enable=false"
+
+networks:
+  traefik-public:
+    driver: overlay
