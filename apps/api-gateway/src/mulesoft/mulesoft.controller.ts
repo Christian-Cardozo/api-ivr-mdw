@@ -38,8 +38,16 @@ export class MulesoftController {
   }
 
   @Get('customer-bill-managment')
-  getMulesoftCustomerBill() {
-    return this.mulesoftService.getMulesoftCustomerBill();
+  @XmlResponse()
+  getMulesoftCustomerBill(
+    @Query() params: {
+      startTime?: string;
+      endTime?: string;
+      qoi?: string;
+      accountId: string;
+    },
+  ) {
+    return this.mulesoftService.getMulesoftCustomerBill(params);    
   }
 
   @Get('payment-method')

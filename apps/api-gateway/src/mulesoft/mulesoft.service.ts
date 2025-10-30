@@ -9,6 +9,7 @@ export class MulesoftService {
 
   private readonly logger = new Logger(MulesoftService.name);
   private readonly cancelBaseUrl: string;
+  private readonly billBaseUrl: string;
   private readonly clientId: string;
   private hb?: NodeJS.Timeout;
 
@@ -18,6 +19,7 @@ export class MulesoftService {
     @Inject('MULESOFT_CUSTOMER_MS') private readonly mulesoftClient: ClientProxy,
   ) {
     this.cancelBaseUrl = this.configService.get<string>('MULESOFT_CANCEL_BASE_URL') || '';
+    this.billBaseUrl = this.configService.get<string>('MULESOFT_BILL_BASE_URL') || '';
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
   }
 
@@ -96,8 +98,32 @@ export class MulesoftService {
     return await response.json();
   }
 
-  getMulesoftCustomerBill() {
-    return `This action returns all mulesoft`;
+  async getMulesoftCustomerBill(params: any) {
+
+    const {startTime, endTime, qoi, accountId} = params;
+
+    const url = `${this.billBaseUrl}/customerBill?startTime=${startTime}&endTime=${endTime}&company=FAN&quantityOfInvoices=${qoi}&accountIntegrationId=${accountId}`
+    const client = this.clientId;
+    const token = await this.authService.getToken();
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      'client_id': `${client}`,     
+    };
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: headers,      
+    })
+
+     if (!response.ok) {
+      const txt = await response.text();
+      throw new HttpException(txt || 'Upstream error', response.status);
+    }
+
+    return await response.json();
+
   }
 
   getMulesoftPaymentMethod() {
