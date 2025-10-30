@@ -103,13 +103,12 @@ export class MulesoftService {
     const {startTime, endTime, qoi, accountId} = params;
 
     const url = `${this.billBaseUrl}/customerBill?startTime=${startTime}&endTime=${endTime}&company=FAN&quantityOfInvoices=${qoi}&accountIntegrationId=${accountId}`
-    const client = this.clientId;
     const token = await this.authService.getToken();
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-      'client_id': `${client}`,     
+      Authorization: `Bearer ${token}`,
+      client_id: this.clientId,
     };
 
     const response = await fetch(url, {
