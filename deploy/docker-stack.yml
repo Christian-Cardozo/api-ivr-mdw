@@ -21,6 +21,7 @@ services:
       IDP_USERKEY: ${IDP_USERKEY}       
       MULESOFT_CUSTOMER_MS_HOST: ${MULESOFT_CUSTOMER_MS_HOST}
       MULESOFT_CUSTOMER_MS_PORT: ${MULESOFT_CUSTOMER_MS_PORT}
+      MULESOFT_BILL_BASE_URL: ${MULESOFT_BILL_BASE_URL}
       HOST: ${HOST}
     networks: [ivr-net, traefik-public]
     # En Linux prod podés usar ingress (shorthand):
