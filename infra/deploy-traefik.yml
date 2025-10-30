@@ -45,7 +45,7 @@ services:
           - node.role == manager
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.dashboard.rule=Host(`traefik.localhost`) || PathPrefix(`/dashboard`) || PathPrefix(`/api`)"
+        - "traefik.http.routers.dashboard.rule=Host(`traefik.localhost`) || PathPrefix(`/dashboard`) || PathPrefix(`/api`) || Host(`localhost`)"
         - "traefik.http.routers.dashboard.entrypoints=traefik"
         - "traefik.http.routers.dashboard.service=api@internal"
         - "traefik.http.services.dummy.loadbalancer.server.port=8080"

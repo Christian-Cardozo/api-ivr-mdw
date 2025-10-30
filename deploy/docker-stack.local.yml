@@ -32,7 +32,7 @@ services:
         - "traefik.enable=true"
         
         # HTTP (7000)
-        - "traefik.http.routers.api-gateway-http.rule=Host(`local.api-ivr-mdw`)"
+        - "traefik.http.routers.api-gateway-http.rule=Host(`local.api-ivr-mdw`) || Host(`localhost`)"
         - "traefik.http.routers.api-gateway-http.entrypoints=web"
         - "traefik.http.routers.api-gateway-http.service=api-gateway"
 
