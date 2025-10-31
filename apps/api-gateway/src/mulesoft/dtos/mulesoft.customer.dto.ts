@@ -1,4 +1,4 @@
-import { IsNumberString, IsString, Length } from 'class-validator';
+import { IsDateString, IsNotEmpty, IsNumberString, IsOptional, IsString, Length } from 'class-validator';
 
 export class AniParamDto {
     @Length(10, 10, { message: 'El ANI debe tener exactamente 10 dígitos' })
@@ -13,4 +13,22 @@ export class DniParamDto {
 
     @IsString()
     type: string;
+}
+
+export class CustomerBillDto {  
+  @IsNotEmpty()
+  @IsDateString() // ✅ valida que sea formato fecha ISO (ej: 2025-10-30T00:00:00Z)
+  startTime?: string;
+  
+  @IsNotEmpty()
+  @IsDateString()
+  endTime?: string;
+  
+  @IsNotEmpty()
+  @IsString()
+  qoi?: string;
+  
+  @IsNotEmpty()
+  @IsString()
+  accountId!: string;
 }

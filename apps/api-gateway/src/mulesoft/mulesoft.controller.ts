@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpException, Param, Post, Query } from '@nestjs/common';
 import { MulesoftService } from './mulesoft.service';
 import { XmlResponse } from '@app/xml/xml-response.decorator';
-import { AniParamDto, DniParamDto } from './dtos/mulesoft.customer.dto';
+import { AniParamDto, CustomerBillDto, DniParamDto } from './dtos/mulesoft.customer.dto';
 
 @Controller('mulesoft')
 export class MulesoftController {
@@ -39,15 +39,8 @@ export class MulesoftController {
 
   @Get('customer-bill-managment')
   @XmlResponse()
-  getMulesoftCustomerBill(
-    @Query() params: {
-      startTime?: string;
-      endTime?: string;
-      qoi?: string;
-      accountId: string;
-    },
-  ) {
-    return this.mulesoftService.getMulesoftCustomerBill(params);    
+  getMulesoftCustomerBill(@Query() params: CustomerBillDto) {
+    return this.mulesoftService.getMulesoftCustomerBill(params);
   }
 
   @Get('payment-method')
