@@ -3,6 +3,7 @@ import { AuthClientService } from '@app/auth-client';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, firstValueFrom, Observable, of, timeout } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
+import { ResilienceService } from '@app/resilience';
 
 @Injectable()
 export class MulesoftService {
@@ -16,6 +17,7 @@ export class MulesoftService {
   constructor(
     private readonly authService: AuthClientService,
     private readonly configService: ConfigService,
+    private readonly resilienceService: ResilienceService,
     @Inject('MULESOFT_CUSTOMER_MS') private readonly mulesoftClient: ClientProxy,
   ) {
     this.cancelBaseUrl = this.configService.get<string>('MULESOFT_CANCEL_BASE_URL') || '';
@@ -100,11 +102,19 @@ export class MulesoftService {
 
   async getMulesoftCustomerBill(params: any) {
 
-    const {startTime, endTime, qoi, accountId} = params;
+    const { startTime, endTime, qoi, accountId } = params;
 
     const url = `${this.billBaseUrl}/customerBill?startTime=${startTime}&endTime=${endTime}&company=FAN&quantityOfInvoices=${qoi}&accountIntegrationId=${accountId}`
-    const token = await this.authService.getToken();
 
+    return this.resilienceService.execute(
+      'mule:bill', 
+      (signal) => this.fetchCustomerBill(url, signal),               
+    )
+
+  }
+
+  async fetchCustomerBill(url: string, signal?: AbortSignal): Promise<any>  {
+    const token = await this.authService.getToken();
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
@@ -113,16 +123,16 @@ export class MulesoftService {
 
     const response = await fetch(url, {
       method: 'GET',
-      headers: headers,      
+      headers: headers,
+      signal
     })
 
-     if (!response.ok) {
+    if (!response.ok) {
       const txt = await response.text();
       throw new HttpException(txt || 'Upstream error', response.status);
     }
 
     return await response.json();
-
   }
 
   getMulesoftPaymentMethod() {

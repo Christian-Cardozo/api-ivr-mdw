@@ -21,7 +21,7 @@ export class MulesoftCustomerMsService {
 
   constructor(
     private readonly authService: AuthClientService,
-    private readonly resilience: ResilienceService, 
+    private readonly resilience: ResilienceService,
     private readonly configService: ConfigService,
   ) {
     this.baseUrl = this.configService.get<string>('MULESOFT_CUSTOMER_BASE_URL') || '';
@@ -36,7 +36,6 @@ export class MulesoftCustomerMsService {
     };
   }
 
-
   //@Retry('mule:getByANI')
   async getByANI(ani: string, signal?: AbortSignal) {
     const url = `${this.baseUrl}/api/v1/customer?excludeNulls=true&deepLevel=3&mobileNumber=${ani}`;
@@ -49,7 +48,7 @@ export class MulesoftCustomerMsService {
   }
 
   //@Resilience('mule:getByDNI')
-  async getByDNI(type:string, dni: string) {
+  async getByDNI(type: string, dni: string) {
     const url = `${this.baseUrl}/api/v1/customer?excludeNulls=true&deepLevel=3&documentType=${type}&documentNumber=${dni}`;
 
     //console.log(this.ResilienceConfig)    
@@ -116,7 +115,6 @@ export class MulesoftCustomerMsService {
     }
   }
 
-
   private shouldRetry(error: any): boolean {
     // Si es un HttpException de NestJS
     if (error instanceof HttpException) {
@@ -176,11 +174,11 @@ export class MulesoftCustomerMsService {
   }
 
   private prunePathsInPlace(root: any, paths: string[][]): void {
-  if (Array.isArray(root)) {
-    for (const item of root) for (const p of paths) this.deletePath(item, p);
-  } else if (root && typeof root === 'object') {
-    for (const p of paths) this.deletePath(root, p);
+    if (Array.isArray(root)) {
+      for (const item of root) for (const p of paths) this.deletePath(item, p);
+    } else if (root && typeof root === 'object') {
+      for (const p of paths) this.deletePath(root, p);
+    }
   }
-}
 
 }

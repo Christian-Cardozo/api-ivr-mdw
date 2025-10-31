@@ -6,10 +6,12 @@ import { AuthClientModule } from '@app/auth-client';
 
 import { MulesoftController } from './mulesoft.controller';
 import { MulesoftService } from './mulesoft.service';
+import { ResilienceModule } from '@app/resilience';
 
 @Module({
   imports: [
     AuthClientModule,
+    ResilienceModule,
     ClientsModule.registerAsync([
       {
         name: 'MULESOFT_CUSTOMER_MS',
