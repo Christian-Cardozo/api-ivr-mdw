@@ -23,9 +23,9 @@ export class AuthClientService {
   /**
    * Llama al IDP para obtener un nuevo token
    */
-  private async fetchToken(): Promise<{ token: string; expiresIn: number }> {
+  private async fetchToken(clientId?:string): Promise<{ token: string; expiresIn: number }> {
     const url = this.config.get<string>('IDP_URL') || '';
-    const userkey = this.config.get<string>('IDP_USERKEY') || '';
+    const userkey = clientId || this.config.get<string>('IDP_USERKEY') || '';
     const auth = 'Basic ' + Buffer.from(userkey).toString('base64');
 
     try {
