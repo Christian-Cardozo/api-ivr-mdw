@@ -30,7 +30,7 @@ export class MulesoftService {
     this.cbsproductInventoryBaseUrl = this.configService.get<string>('MULESOFT_CBS_BASE_URL') || '';
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
     this.corpoContactBaseUrl = this.configService.get<string>('MULESOFT_CORPOCONTACT_BASE_URL') || '';
-    this.corpoContactClientId = this.configService.get<string>('MULESOFT_CORPO_CONTACT_CLIENT_ID') || '';
+    this.corpoContactClientId = this.configService.get<string>('MULESOFT_CORPOCONTACT_CLIENT_ID') || '';
     
   }
 
@@ -209,21 +209,20 @@ export class MulesoftService {
   
     return this.resilienceService.execute(
       'mule-corpo-contact',
-      (signal) => this.fetchmulecorpocontact(params, url, signal),
+      (signal) => this.fetchMuleCorpoContact(url, signal),
     )
   }
 
-  async fetchmulecorpocontact(params: any, url: string, signal?: AbortSignal): Promise<any> {
-    const token = await this.authService.getToken(this.corpoContactClientId);
+  async fetchMuleCorpoContact(url: string, signal?: AbortSignal): Promise<any> {
+    const token = await this.authService.getCustomToken('idp:mule:corpo:token', 'MULESOFT_CORPOCONTACT_CLIENT_ID');
     
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
-      client_id: this.clientId,
-     
+      client_id: this.corpoContactClientId.split(':')[0],     
     };
-
+      
     const response = await fetch(url, {
       method: 'GET',
       headers: headers,
