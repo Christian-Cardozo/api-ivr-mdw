@@ -11,6 +11,7 @@ export class MulesoftService {
   private readonly logger = new Logger(MulesoftService.name);
   private readonly cancelBaseUrl: string;
   private readonly billBaseUrl: string;
+  private readonly cbsproductInventoryUrl: string;
   private readonly clientId: string;
   private hb?: NodeJS.Timeout;
 
@@ -22,6 +23,7 @@ export class MulesoftService {
   ) {
     this.cancelBaseUrl = this.configService.get<string>('MULESOFT_CANCEL_BASE_URL') || '';
     this.billBaseUrl = this.configService.get<string>('MULESOFT_BILL_BASE_URL') || '';
+    this.cbsproductInventoryUrl = this.configService.get<string>('MULESOFT_CBS_BASE_URL') || '';
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
   }
 
@@ -107,13 +109,13 @@ export class MulesoftService {
     const url = `${this.billBaseUrl}/customerBill?startTime=${startTime}&endTime=${endTime}&company=FAN&quantityOfInvoices=${qoi}&accountIntegrationId=${accountId}`
 
     return this.resilienceService.execute(
-      'mule:bill', 
-      (signal) => this.fetchCustomerBill(url, signal),               
+      'mule:bill',
+      (signal) => this.fetchCustomerBill(url, signal),
     )
 
   }
 
-  async fetchCustomerBill(url: string, signal?: AbortSignal): Promise<any>  {
+  async fetchCustomerBill(url: string, signal?: AbortSignal): Promise<any> {
     const token = await this.authService.getToken();
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -150,4 +152,46 @@ export class MulesoftService {
   getMulesoftLoansOffering() {
     return `This action returns all mulesoft`;
   }
+
+  async getMulesoftcbsproductinventory(params: any) {
+    const { ani } = params;
+
+    const url = `${this.cbsproductInventoryUrl}/v1/statusDetail?primaryIdentity=${ani}`
+
+  
+    return this.resilienceService.execute(
+      'cbs-product-inventory',
+      (signal) => this.fetchcbsproductinventory(params, url, signal),
+    )
+  }
+
+  async fetchcbsproductinventory(params: any, url: string, signal?: AbortSignal): Promise<any> {
+    const token = await this.authService.getToken();
+    const { xcorrelationid, } = params
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      client_id: this.clientId,
+      'x-correlation-id': `${xcorrelationid}`,
+      'currentApplication': `IVR`,
+      'currentComponent': `IVR`,
+      'sourceApplication': 'IVR',
+      'sourceComponent': 'IVR_Cosulta_Saldo',
+    };
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: headers,
+      signal
+    })
+
+    if (!response.ok) {
+      const txt = await response.text();
+      throw new HttpException(txt || 'Upstream error', response.status);
+    }
+
+    return await response.json();
+  }
 }
+

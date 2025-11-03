@@ -32,3 +32,13 @@ export class CustomerBillDto {
   @IsString()
   accountId!: string;
 }
+
+export class CbsProductInventory {
+    @Length(10, 10, { message: 'El ANI debe tener exactamente 10 dígitos' })
+    @IsNumberString({}, { message: 'El ANI debe contener solo números' })
+   
+    ani: string;
+
+     @IsOptional()
+  'x-correlation-id'?: string;
+}

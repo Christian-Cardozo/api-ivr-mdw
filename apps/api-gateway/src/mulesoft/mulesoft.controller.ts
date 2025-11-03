@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpException, Param, Post, Query } from '@nestjs/common';
 import { MulesoftService } from './mulesoft.service';
 import { XmlResponse } from '@app/xml/xml-response.decorator';
-import { AniParamDto, CustomerBillDto, DniParamDto } from './dtos/mulesoft.customer.dto';
+import { AniParamDto, CustomerBillDto, DniParamDto, CbsProductInventory } from './dtos/mulesoft.customer.dto';
 
 @Controller('mulesoft')
 export class MulesoftController {
@@ -61,5 +61,12 @@ export class MulesoftController {
   @Get('loans-offering')
   getMulesoftLoansOffering() {
     return this.mulesoftService.getMulesoftLoansOffering();
+  }
+
+  @Get('cbs-product-inventory')
+  @XmlResponse()
+  getMulesoftcbsproductinventory(@Query() params : CbsProductInventory) {
+    return this.mulesoftService.getMulesoftcbsproductinventory(params);
+
   }
 }
