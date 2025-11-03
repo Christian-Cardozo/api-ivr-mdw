@@ -33,7 +33,7 @@ export class CustomerBillDto {
   accountId!: string;
 }
 
-export class CbsProductInventory {
+export class CbsProductInventoryDto {
     @Length(10, 10, { message: 'El ANI debe tener exactamente 10 dígitos' })
     @IsNumberString({}, { message: 'El ANI debe contener solo números' })
    
