@@ -47,6 +47,14 @@ build-dev-mule-ms:
     APP_NAME: "mulesoft-customer-ms"
     IMAGE_NAME: "api-ivr-mdw/mulesoft-customer-ms"
 
+build-dev-mule-ms:
+  extends: .build-template
+  only: { refs: [ dev ] }
+  variables:
+    IMAGE_TAG: "dev"
+    APP_NAME: "mulesoft-digital-billing-ms"
+    IMAGE_NAME: "api-ivr-mdw/mulesoft-digital-billing-ms"
+
 build-preprod-api-gateway:
   extends: .build-template
   only: { refs: [ preprod ] }
@@ -55,13 +63,21 @@ build-preprod-api-gateway:
     APP_NAME: "api-gateway"
     IMAGE_NAME: "api-ivr-mdw/api-gateway"
 
-build-preprod-mule-ms:
+build-preprod-mulesoft-customer-ms:
   extends: .build-template
   only: { refs: [ preprod ] }
   variables:
     IMAGE_TAG: "preprod"
     APP_NAME: "mulesoft-customer-ms"
     IMAGE_NAME: "api-ivr-mdw/mulesoft-customer-ms"
+
+build-preprod-mulesoft-digital-billing-ms:
+  extends: .build-template
+  only: { refs: [ preprod ] }
+  variables:
+    IMAGE_TAG: "preprod"
+    APP_NAME: "mulesoft-digital-billing-ms"
+    IMAGE_NAME: "api-ivr-mdw/mulesoft-digital-billing-ms"
 
 build-prod-api-gateway:
   extends: .build-template
@@ -71,13 +87,21 @@ build-prod-api-gateway:
     APP_NAME: "api-gateway"
     IMAGE_NAME: "api-ivr-mdw/api-gateway"
 
-build-prod-mule-ms:
+build-prod-mulesoft-customer-ms:
   extends: .build-template
   only: { refs: [ prod ] }
   variables:
     IMAGE_TAG: "prod"
     APP_NAME: "mulesoft-customer-ms"
     IMAGE_NAME: "api-ivr-mdw/mulesoft-customer-ms"
+
+build-prod-mulesoft-digital-billing-ms:
+  extends: .build-template
+  only: { refs: [ prod ] }
+  variables:
+    IMAGE_TAG: "prod"
+    APP_NAME: "mulesoft-digital-billing-ms"
+    IMAGE_NAME: "api-ivr-mdw/mulesoft-digital-billing-ms"
 
 # ===================== DEPLOY =====================
 

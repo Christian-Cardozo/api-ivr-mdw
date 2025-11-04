@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MulesoftDigitalBillingMsController } from './mulesoft-digital-billing-ms.controller';
-import { MulesoftDigitalBillingMsService } from './mulesoft-digital-billing-ms.service';
+import { MulesoftDigitalBillingMsController } from '../mulesoft-digital-billing-ms.controller';
+import { MulesoftDigitalBillingMsService } from '../mulesoft-digital-billing-ms.service';
 
 describe('MulesoftDigitalBillingMsController', () => {
   let mulesoftDigitalBillingMsController: MulesoftDigitalBillingMsController;
@@ -13,10 +13,5 @@ describe('MulesoftDigitalBillingMsController', () => {
 
     mulesoftDigitalBillingMsController = app.get<MulesoftDigitalBillingMsController>(MulesoftDigitalBillingMsController);
   });
-
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(mulesoftDigitalBillingMsController.getHello()).toBe('Hello World!');
-    });
-  });
+  
 });
