@@ -13,6 +13,7 @@ export class MulesoftService {
   private readonly corpoContactClientId: string;
   private readonly baseUrl: string;
   private readonly env: string;
+  private readonly additionalOrderingBaseUrl: string;
   private hb?: NodeJS.Timeout;
 
 
@@ -27,6 +28,7 @@ export class MulesoftService {
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
     this.corpoContactClientId = this.configService.get<string>('MULESOFT_CORPOCONTACT_CLIENT_ID') || '';
     this.baseUrl = this.configService.get<string>('MULESOFT_BASE_URL') || '';
+    this.additionalOrderingBaseUrl = this.configService.get<string>('MULESOFT_ADDITIONALORDERING_BASE_URL') || '';
     this.env = this.configService.get<string>('APP_ENV') || '';
   }
 
@@ -303,6 +305,52 @@ export class MulesoftService {
 
     return await response.json();
   }
+
+  async getMulesoftAdditionalOrdering(params: any, body: any) {
+
+    const url = `${this.baseUrl}/prod-order-mngmt-papi-${this.env}/api/v1/additionalOrder`
+
+    return this.resilienceService.execute(
+      'additional-ordering',
+      (signal) => this.fetchAdditionalOrdering(params, body, url, signal),
+    )
+  }
+
+  async fetchAdditionalOrdering(params: any, body: any, url: string, signal?: AbortSignal): Promise<any> {
+    const token = await this.authService.getToken();
+    const { xcorrelationid } = params
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      client_id: this.clientId,
+      'x-correlation-id': `${xcorrelationid}`,
+      'currentApplication': `IVR`,
+      'currentComponent': `IVR`,
+      'sourceApplication': 'IVR',
+      'sourceComponent': 'Activacion Pack',
+    };
+
+    console.log('Additional Ordering URL:', url);
+    console.log('Additional Ordering Headers:', headers);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      body: body,
+      signal
+    })
+
+    if (!response.ok) {
+      const txt = await response.text();
+      throw new HttpException(txt || 'Upstream error', response.status);
+    }
+
+    console.log('Additional Ordering Response Status:', response.statusText);
+
+    return await response.json();
+  }
+
 
 }
 

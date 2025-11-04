@@ -81,3 +81,10 @@ export class DigitalBillingDto {
   @IsOptional()
   'x-correlation-id'?: string;
 }
+
+export class AdditionalOrderingDto {
+  @IsOptional()
+  xcorrelationid?: string;
+}
+
+
