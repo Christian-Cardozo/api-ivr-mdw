@@ -8,6 +8,10 @@ export class RpcToHttpInterceptor implements NestInterceptor {
   intercept(_ctx: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       catchError((err: any) => {
+        // ⛔️ No interceptar HttpException: re-lanzar intacta
+        if (err instanceof HttpException) {
+          return throwError(() => err);
+        }
         // Nest suele poner el payload de la RpcException en err.error
         const payload = err?.error ?? err;
         const status = payload?.statusCode ?? 502;

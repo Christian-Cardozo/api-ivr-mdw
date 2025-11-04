@@ -309,7 +309,7 @@ export class MulesoftService {
   async getMulesoftAdditionalOrdering(params: any, body: any) {
 
     const url = `${this.baseUrl}/prod-order-mngmt-papi-${this.env}/api/v1/additionalOrder`
-
+        
     return this.resilienceService.execute(
       'additional-ordering',
       (signal) => this.fetchAdditionalOrdering(params, body, url, signal),
@@ -330,23 +330,18 @@ export class MulesoftService {
       'sourceApplication': 'IVR',
       'sourceComponent': 'Activacion Pack',
     };
-
-    console.log('Additional Ordering URL:', url);
-    console.log('Additional Ordering Headers:', headers);
-
+    
     const response = await fetch(url, {
       method: 'POST',
       headers: headers,
-      body: body,
+      body: JSON.stringify(body),
       signal
     })
 
     if (!response.ok) {
-      const txt = await response.text();
+      const txt = await response.text();      
       throw new HttpException(txt || 'Upstream error', response.status);
     }
-
-    console.log('Additional Ordering Response Status:', response.statusText);
 
     return await response.json();
   }
