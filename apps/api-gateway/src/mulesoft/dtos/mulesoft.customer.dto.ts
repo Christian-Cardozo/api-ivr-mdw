@@ -1,4 +1,4 @@
-import { IsDateString, IsNotEmpty, IsNumberString, IsOptional, IsString, Length } from 'class-validator';
+import { IsDateString, IsIn, IsNotEmpty, IsNumberString, IsOptional, IsString, Length } from 'class-validator';
 
 export class AniParamDto {
   @Length(10, 10, { message: 'El ANI debe tener exactamente 10 dígitos' })
@@ -43,8 +43,21 @@ export class CbsProductInventoryDto {
   'x-correlation-id'?: string;
 }
 
-export class CorpoContactDto {
+export class ContactDto {
   @Length(10, 10, { message: 'El ANI debe tener exactamente 10 dígitos' })
   @IsNumberString({}, { message: 'El ANI debe contener solo números' })
   ani: string;
+}
+
+export class CancellationDto {
+  @Length(10, 10, { message: 'El ANI debe tener exactamente 10 dígitos' })
+  @IsNumberString({}, { message: 'El ANI debe contener solo números' })
+  ani: string;
+
+  @IsOptional()
+  'x-correlation-id'?: string;
+    
+  @IsOptional()  
+  @IsIn(['accept', 'reject'])
+  action?: 'accept' | 'reject';
 }

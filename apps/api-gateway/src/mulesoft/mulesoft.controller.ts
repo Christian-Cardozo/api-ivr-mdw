@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { MulesoftService } from './mulesoft.service';
 import { XmlResponse } from '@app/xml/xml-response.decorator';
-import { AniParamDto, CustomerBillDto, DniParamDto, CbsProductInventoryDto, CorpoContactDto } from './dtos/mulesoft.customer.dto';
+import { AniParamDto, CustomerBillDto, DniParamDto, CbsProductInventoryDto, ContactDto, CancellationDto } from './dtos/mulesoft.customer.dto';
 
 @Controller('mulesoft')
 export class MulesoftController {
@@ -18,28 +18,24 @@ export class MulesoftController {
   @Get('customer-management/:type/:dni')
   @XmlResponse()
   async getMulesoftCustomerByDNI(
-    @Param('type') type: string,
-    @Param('dni') dni: string,
+    @Param() { type, dni }: DniParamDto,
   ) {
     return this.mulesoftService.getMulesoftCustomerByDNI(type, dni);
   }
 
   @Post('cancellation-process')
   getMulesoftCancellation(
-    @Query() params: {
-      xcorrelationid?: string;
-      currentapplication?: string;
-      currentcomponent?: string;
-      action: 'accept' | 'reject';
-    },
+    @Query() params: CancellationDto,
     @Body() body: any
   ) {
     return this.mulesoftService.getMulesoftCancellation(params, body);
   }
 
-  @Get('customer-bill-managment')
+  @Get('customer-bill-management')
   @XmlResponse()
-  getMulesoftCustomerBill(@Query() params: CustomerBillDto) {
+  getMulesoftCustomerBill(
+    @Query() params: CustomerBillDto
+  ) {
     return this.mulesoftService.getMulesoftCustomerBill(params);
   }
 
@@ -65,14 +61,15 @@ export class MulesoftController {
 
   @Get('cbs-product-inventory')
   @XmlResponse()
-    getMulesoftcbsproductinventory(@Query() params : CbsProductInventoryDto) {
-    return this.mulesoftService.getMulesoftcbsproductinventory(params);
+  getMulesoftCbsProductInventory(
+    @Query() params: CbsProductInventoryDto
+  ) {
+    return this.mulesoftService.getMulesoftCbsProductInventory(params);
   }
 
-
-   @Get('mule-corpo-contact')
+  @Get('contact-management/:ani')
   @XmlResponse()
-    getCorpocontact(@Query() params : CorpoContactDto) {
-    return this.mulesoftService.getCorpocontact(params);
+  getMulesoftContact(@Param() { ani }: ContactDto) {
+    return this.mulesoftService.getMulesoftContact(ani);
   }
 }

@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 export class MulesoftCustomerMsService {
   private readonly logger = new Logger(MulesoftCustomerMsService.name);
   private readonly baseUrl: string;
+  private readonly env: string;
   private readonly clientId: string;
   private readonly ResilienceConfig: ResilienceConfig;
 
@@ -21,11 +22,12 @@ export class MulesoftCustomerMsService {
 
   constructor(
     private readonly authService: AuthClientService,
-    private readonly resilience: ResilienceService,
+    private readonly resilienceService: ResilienceService,
     private readonly configService: ConfigService,
   ) {
-    this.baseUrl = this.configService.get<string>('MULESOFT_CUSTOMER_BASE_URL') || '';
+    this.baseUrl = this.configService.get<string>('MULESOFT_BASE_URL') || '';
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
+    this.env = this.configService.get<string>('APP_ENV') || '';
 
     this.ResilienceConfig = {
       maxRetries: this.configService.get<number>('MULESOFT_CUSTOMER_RETRIES', 2),
@@ -37,10 +39,10 @@ export class MulesoftCustomerMsService {
   }
 
   //@Retry('mule:getByANI')
-  async getByANI(ani: string, signal?: AbortSignal) {
-    const url = `${this.baseUrl}/api/v1/customer?excludeNulls=true&deepLevel=3&mobileNumber=${ani}`;
+  async getByANI(ani: string) {
+    const url = `${this.baseUrl}/customer-mngmt-proc-api-${this.env}/api/v1/customer?excludeNulls=true&deepLevel=3&mobileNumber=${ani}`;
 
-    return this.resilience.execute(
+    return this.resilienceService.execute(
       'mule:getByANI',
       (signal) => this.fetchCustomer(url, signal),
       this.ResilienceConfig,
@@ -49,10 +51,10 @@ export class MulesoftCustomerMsService {
 
   //@Resilience('mule:getByDNI')
   async getByDNI(type: string, dni: string) {
-    const url = `${this.baseUrl}/api/v1/customer?excludeNulls=true&deepLevel=3&documentType=${type}&documentNumber=${dni}`;
+    const url = `${this.baseUrl}/customer-mngmt-proc-api-${this.env}/api/v1/customer?excludeNulls=true&deepLevel=3&documentType=${type}&documentNumber=${dni}`;
 
     //console.log(this.ResilienceConfig)    
-    return this.resilience.execute(
+    return this.resilienceService.execute(
       'mule:getByDNI',
       (signal) => this.fetchCustomer(url, signal),
       this.ResilienceConfig,
@@ -89,12 +91,7 @@ export class MulesoftCustomerMsService {
       }
 
       const body = await response.json();
-
-      // 🧹 limpiar campos como en PHP
       const pruned = this.prunePathsInPlace(body, this.ROUTES_TO_DELETE);
-
-      // Si querés emular EXACTO el PHP, devolvé string:
-      // return JSON.stringify(pruned, undefined, 2);
       //return pruned;
       return body;
 

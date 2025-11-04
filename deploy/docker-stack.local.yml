@@ -11,9 +11,7 @@ networks:
 services:
   api-gateway:
     image: api-ivr-mdw/api-gateway:latest
-    env_file: ./.env
-    environment:
-      APP_ENV: local
+    env_file: ./.env    
     networks: 
       - ivr-net
       - traefik-public
@@ -24,7 +22,7 @@ services:
     #    mode: host
     deploy:
       mode: replicated
-      replicas: 2
+      replicas: 1
       restart_policy: { condition: any }
       update_config:
         order: start-first
@@ -48,18 +46,16 @@ services:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/health >/dev/null 2>&1 || exit 1"]
       interval: 30s
       timeout: 5s
-      retries: 5
+      retries: 1
       start_period: 60s
 
   mulesoft-customer-ms:
     image: api-ivr-mdw/mulesoft-customer-ms:latest
-    env_file: ./.env
-    environment:
-      APP_ENV: local
+    env_file: ./.env    
     networks: [ivr-net]
     deploy:
       mode: replicated
-      replicas: 5
+      replicas: 1
       restart_policy: { condition: any }
 
   redis:

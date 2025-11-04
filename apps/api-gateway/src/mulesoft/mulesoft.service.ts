@@ -9,15 +9,13 @@ import { ResilienceService } from '@app/resilience';
 export class MulesoftService {
 
   private readonly logger = new Logger(MulesoftService.name);
-  private readonly cancelBaseUrl: string;
-  private readonly billBaseUrl: string;
-  private readonly cbsproductInventoryBaseUrl: string;
   private readonly clientId: string;
-  private readonly corpoContactBaseUrl: string;
   private readonly corpoContactClientId: string;
+  private readonly baseUrl: string;
+  private readonly env: string;
   private hb?: NodeJS.Timeout;
- 
-  
+
+
 
   constructor(
     private readonly authService: AuthClientService,
@@ -25,13 +23,10 @@ export class MulesoftService {
     private readonly resilienceService: ResilienceService,
     @Inject('MULESOFT_CUSTOMER_MS') private readonly mulesoftClient: ClientProxy,
   ) {
-    this.cancelBaseUrl = this.configService.get<string>('MULESOFT_CANCEL_BASE_URL') || '';
-    this.billBaseUrl = this.configService.get<string>('MULESOFT_BILL_BASE_URL') || '';
-    this.cbsproductInventoryBaseUrl = this.configService.get<string>('MULESOFT_CBS_BASE_URL') || '';
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
-    this.corpoContactBaseUrl = this.configService.get<string>('MULESOFT_CORPOCONTACT_BASE_URL') || '';
     this.corpoContactClientId = this.configService.get<string>('MULESOFT_CORPOCONTACT_CLIENT_ID') || '';
-    
+    this.baseUrl = this.configService.get<string>('MULESOFT_BASE_URL') || '';
+    this.env = this.configService.get<string>('APP_ENV') || '';
   }
 
   async onModuleInit() {
@@ -68,29 +63,35 @@ export class MulesoftService {
     }, 15000);
   }
 
-
   getMulesoftCustomerByANI(ani: string): Observable<string> {
     return this.mulesoftClient.send<string, string>('get-by-ani', ani);
   }
 
-  getMulesoftCustomerByDNI(type: string, dni: string): Observable<string> {
+  getMulesoftCustomerByDNI(type:string, dni:string): Observable<string> {
     return this.mulesoftClient.send<string, { type: string, dni: string }>('get-by-dni', { type, dni })
   }
 
   async getMulesoftCancellation(params: any, body: any) {
-    const { xcorrelationid, currentApplication, currentComponent, action } = params;
-    const url = `${this.cancelBaseUrl}/api/v1/retention/${action}`;
-    const client = this.clientId;
-    const token = await this.authService.getToken();
+    const { action } = params;
+    const url = `${this.baseUrl}/cancellation-process-api-${this.env}/api/v1/retention/${action}`;
 
+    return this.resilienceService.execute(
+      'mule:cancellation',
+      () => this.fetchMulesoftCancellation(params, url, body),
+    );
+  }
+
+  async fetchMulesoftCancellation(params: any, url: string, body: any) {
+    const { xcorrelationid } = params;
+    const token = await this.authService.getToken();
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
-      'client_id': `${client}`,
+      'client_id': this.clientId,
       'x-correlation-id': `${xcorrelationid}`,
-      'currentApplication': `${currentApplication}`,
-      'currentComponent': `${currentComponent}`,
+      'currentApplication': `IVR`,
+      'currentComponent': `IVR`,
       'sourceApplication': 'IVR',
       'sourceComponent': 'Martech',
     };
@@ -112,14 +113,12 @@ export class MulesoftService {
   async getMulesoftCustomerBill(params: any) {
 
     const { startTime, endTime, qoi, accountId } = params;
-
-    const url = `${this.billBaseUrl}/customerBill?startTime=${startTime}&endTime=${endTime}&company=FAN&quantityOfInvoices=${qoi}&accountIntegrationId=${accountId}`
+    const url = `${this.baseUrl}/customer-bill-mngmt-papi-${this.env}/v1/customerBill?startTime=${startTime}&endTime=${endTime}&company=FAN&quantityOfInvoices=${qoi}&accountIntegrationId=${accountId}`
 
     return this.resilienceService.execute(
       'mule:bill',
       (signal) => this.fetchCustomerBill(url, signal),
     )
-
   }
 
   async fetchCustomerBill(url: string, signal?: AbortSignal): Promise<any> {
@@ -160,19 +159,17 @@ export class MulesoftService {
     return `This action returns all mulesoft`;
   }
 
-  async getMulesoftcbsproductinventory(params: any) {
+  async getMulesoftCbsProductInventory(params: any) {
     const { ani } = params;
+    const url = `${this.baseUrl}/cbs-product-inventory-mngmnt-sapi-${this.env}/v1/statusDetail?primaryIdentity=${ani}`
 
-    const url = `${this.cbsproductInventoryBaseUrl}/v1/statusDetail?primaryIdentity=${ani}`
-
-  
     return this.resilienceService.execute(
-      'cbs-product-inventory',
-      (signal) => this.fetchcbsproductinventory(params, url, signal),
+      'mule:cbs-product-inventory',
+      (signal) => this.fetchCbsProductInventory(params, url, signal),
     )
   }
 
-  async fetchcbsproductinventory(params: any, url: string, signal?: AbortSignal): Promise<any> {
+  async fetchCbsProductInventory(params: any, url: string, signal?: AbortSignal): Promise<any> {
     const token = await this.authService.getToken();
     const { xcorrelationid, } = params
 
@@ -201,28 +198,25 @@ export class MulesoftService {
     return await response.json();
   }
 
-    async getCorpocontact(params: any) {
-    const { ani } = params;
+  async getMulesoftContact(ani: string) {
 
-    const url = `${this.corpoContactBaseUrl}/api/contact?fields=relatedRoles&excludeNulls=true&filtering=telephoneNumber=${ani}`
+    const url = `${this.baseUrl}/contact-mngmt-papi-${this.env}/api/contact?fields=relatedRoles&excludeNulls=true&filtering=telephoneNumber=${ani}`
 
-  
     return this.resilienceService.execute(
-      'mule-corpo-contact',
-      (signal) => this.fetchMuleCorpoContact(url, signal),
+      'mule:contact',
+      (signal) => this.fetchMulesoftContact(url, signal),
     )
   }
 
-  async fetchMuleCorpoContact(url: string, signal?: AbortSignal): Promise<any> {
-    const token = await this.authService.getCustomToken('idp:mule:corpo:token', 'MULESOFT_CORPOCONTACT_CLIENT_ID');
-    
+  async fetchMulesoftContact(url: string, signal?: AbortSignal): Promise<any> {
+    const token = await this.authService.getCustomToken('idp:mule:contact:token', 'MULESOFT_CORPOCONTACT_CLIENT_ID');
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
-      client_id: this.corpoContactClientId.split(':')[0],     
+      client_id: this.corpoContactClientId.split(':')[0],
     };
-      
+
     const response = await fetch(url, {
       method: 'GET',
       headers: headers,
@@ -236,5 +230,6 @@ export class MulesoftService {
 
     return await response.json();
   }
+
 }
 
