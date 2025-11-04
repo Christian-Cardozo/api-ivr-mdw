@@ -125,8 +125,7 @@ deploy-dev:
   variables:
     ENV_NAME: "development"    
     STACK_NAME: "ivr-stack-dev"
-    IMAGE_TAG: "dev" 
-    APP_ENV: "dev"
+    IMAGE_TAG: "dev"     
     HOST: "dev-gestionivr.slz"        
 
 deploy-preprod:
@@ -138,8 +137,7 @@ deploy-preprod:
   variables:
     ENV_NAME: "preproduction"    
     STACK_NAME: "ivr-stack-preprod"
-    IMAGE_TAG: "preprod"   
-    APP_ENV: "preprod"
+    IMAGE_TAG: "preprod"       
     HOST: "prepro-gestionivr.slz"   
 
 deploy-slz:
@@ -151,8 +149,7 @@ deploy-slz:
   variables:
     ENV_NAME: "production"   
     STACK_NAME: "ivr-stack-slz"
-    IMAGE_TAG: "prod"
-    APP_ENV: "prod" 
+    IMAGE_TAG: "prod"     
     HOST: "gestionivr.slz"
 
 deploy-hor:
@@ -165,5 +162,4 @@ deploy-hor:
     ENV_NAME: "production"    
     STACK_NAME: "ivr-stack-hor"
     IMAGE_TAG: "prod"    
-    APP_ENV: "prod"
     HOST: "gestionivr.hor"
