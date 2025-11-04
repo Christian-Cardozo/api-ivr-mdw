@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { MulesoftService } from './mulesoft.service';
 import { XmlResponse } from '@app/xml/xml-response.decorator';
-import { AniParamDto, CustomerBillDto, DniParamDto, CbsProductInventoryDto, ContactDto, CancellationDto } from './dtos/mulesoft.customer.dto';
+import { AniParamDto, CustomerBillDto, DniParamDto, CbsProductInventoryDto, ContactDto, CancellationDto, LoansOfferringDto, YoizenDto, DigitalBillingDto } from './dtos/mulesoft.customer.dto';
 
 @Controller('mulesoft')
 export class MulesoftController {
@@ -54,9 +54,13 @@ export class MulesoftController {
     return this.mulesoftService.getMulesoftBillingAccountBalance();
   }
 
-  @Get('loans-offering')
-  getMulesoftLoansOffering() {
-    return this.mulesoftService.getMulesoftLoansOffering();
+  @Post('loans-offering')
+  @XmlResponse()
+  getMulesoftLoansOffering(
+    @Query() params: LoansOfferringDto,
+    @Body() body: any
+  ) {
+    return this.mulesoftService.getMulesoftLoansOffering(params, body);
   }
 
   @Get('cbs-product-inventory')
@@ -71,5 +75,21 @@ export class MulesoftController {
   @XmlResponse()
   getMulesoftContact(@Param() { ani }: ContactDto) {
     return this.mulesoftService.getMulesoftContact(ani);
+  }
+
+  @Post('yoizen-management')
+  @XmlResponse()
+  getMulesoftYoizen(
+    @Body() body: YoizenDto
+  ) {
+    return this.mulesoftService.getMulesoftYoizen(body);
+  }
+
+  @Post('digital-billing-management')
+  @XmlResponse()
+  getMulesoftDigitalBilling(
+    @Body() body: DigitalBillingDto
+  ) {
+    return this.mulesoftService.getMulesoftDigitalBilling(body);
   }
 }

@@ -1,0 +1,9 @@
+{
+  "name": "mulesoft-digital-billing-ms",
+  "private": true,
+  "scripts": {
+    "build": "nest build mulesoft-digital-billing-ms",
+    "start:prod": "node dist/apps/mulesoft-digital-billing-ms/main.js",
+    "start:dev": "nest start mulesoft-digital-billing-ms --watch"
+  }
+}

@@ -61,3 +61,23 @@ export class CancellationDto {
   @IsIn(['accept', 'reject'])
   action?: 'accept' | 'reject';
 }
+
+export class LoansOfferringDto {
+  @IsOptional()
+  'x-correlation-id'?: string;
+}
+
+export class YoizenDto {
+  @Length(10, 10, { message: 'El ANI debe tener exactamente 10 dígitos' })
+  @IsNumberString({}, { message: 'El ANI debe contener solo números' })
+  phoneNumber: string;
+
+  @IsNotEmpty()
+  @IsString()
+  elementName: string;
+}
+
+export class DigitalBillingDto {
+  @IsOptional()
+  'x-correlation-id'?: string;
+}

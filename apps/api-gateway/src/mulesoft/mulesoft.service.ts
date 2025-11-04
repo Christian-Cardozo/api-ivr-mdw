@@ -21,7 +21,8 @@ export class MulesoftService {
     private readonly authService: AuthClientService,
     private readonly configService: ConfigService,
     private readonly resilienceService: ResilienceService,
-    @Inject('MULESOFT_CUSTOMER_MS') private readonly mulesoftClient: ClientProxy,
+    @Inject('MULESOFT_CUSTOMER_MS') private readonly mulesoftCustomerClient: ClientProxy,
+    @Inject('MULESOFT_DIGITAL_BILLING_MS') private readonly mulesoftDigitalBillingClient: ClientProxy,
   ) {
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
     this.corpoContactClientId = this.configService.get<string>('MULESOFT_CORPOCONTACT_CLIENT_ID') || '';
@@ -36,12 +37,12 @@ export class MulesoftService {
 
   onModuleDestroy() {
     if (this.hb) clearInterval(this.hb);
-    this.mulesoftClient.close();
+    this.mulesoftCustomerClient.close();
   }
 
   private async ensureConnected() {
     try {
-      await this.mulesoftClient.connect();
+      await this.mulesoftCustomerClient.connect();
       this.logger.log('TCP client conectado');
     } catch (e) {
       this.logger.warn(`Fallo connect(): ${e?.code || e?.message}. Reintentando...`);
@@ -54,7 +55,7 @@ export class MulesoftService {
     this.hb = setInterval(async () => {
       try {
         await firstValueFrom(
-          this.mulesoftClient.send<string, string>('ping', 'ok').pipe(
+          this.mulesoftCustomerClient.send<string, string>('ping', 'ok').pipe(
             timeout(5000),
             catchError(() => of('err')),
           ),
@@ -64,11 +65,15 @@ export class MulesoftService {
   }
 
   getMulesoftCustomerByANI(ani: string): Observable<string> {
-    return this.mulesoftClient.send<string, string>('get-by-ani', ani);
+    return this.mulesoftCustomerClient.send<string, string>('get-by-ani', ani);
   }
 
-  getMulesoftCustomerByDNI(type:string, dni:string): Observable<string> {
-    return this.mulesoftClient.send<string, { type: string, dni: string }>('get-by-dni', { type, dni })
+  getMulesoftCustomerByDNI(type: string, dni: string): Observable<string> {
+    return this.mulesoftCustomerClient.send<string, { type: string, dni: string }>('get-by-dni', { type, dni })
+  }
+
+  getMulesoftDigitalBilling(body: any): Observable<string> {
+    return this.mulesoftDigitalBillingClient.send<string, any>('digital-billing', body)
   }
 
   async getMulesoftCancellation(params: any, body: any) {
@@ -155,8 +160,43 @@ export class MulesoftService {
     return `This action returns all mulesoft`;
   }
 
-  getMulesoftLoansOffering() {
-    return `This action returns all mulesoft`;
+  async getMulesoftLoansOffering(params: any, body: any) {
+    const url = `${this.baseUrl}/salesforce-loans-offering-sapi-${this.env}/api/v1/getAvailableLoans`
+
+    return this.resilienceService.execute(
+      'mule:loans-offering',
+      (signal) => this.fetchLoansOffering(params, body, url, signal),
+    )
+  }
+
+  async fetchLoansOffering(params: any, body: any, url: string, signal?: AbortSignal): Promise<any> {
+    const token = await this.authService.getToken();
+    const { xcorrelationid, } = params
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      client_id: this.clientId,
+      'x-correlation-id': `${xcorrelationid}`,
+      'currentApplication': `IVR_SOS`,
+      'currentComponent': `IVR_SOS`,
+      'sourceApplication': 'IVR_SOS',
+      'sourceComponent': 'Loan_SOS',
+    };
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: headers,
+      body: body,
+      signal
+    })
+
+    if (!response.ok) {
+      const txt = await response.text();
+      throw new HttpException(txt || 'Upstream error', response.status);
+    }
+
+    return await response.json();
   }
 
   async getMulesoftCbsProductInventory(params: any) {
@@ -220,6 +260,39 @@ export class MulesoftService {
     const response = await fetch(url, {
       method: 'GET',
       headers: headers,
+      signal
+    })
+
+    if (!response.ok) {
+      const txt = await response.text();
+      throw new HttpException(txt || 'Upstream error', response.status);
+    }
+
+    return await response.json();
+  }
+
+  async getMulesoftYoizen(body: any) {
+    const url = `${this.baseUrl}/yoizen-mngmt-papi-${this.env}/api/contactwpysocial`
+
+    return this.resilienceService.execute(
+      'mule:yoizen',
+      (signal) => this.fetchYoizen(body, url, signal),
+    )
+  }
+
+  async fetchYoizen(body: any, url: string, signal?: AbortSignal): Promise<any> {
+    const token = await this.authService.getToken();
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      //client_id: this.clientId,      
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      body: body,
       signal
     })
 

@@ -28,6 +28,19 @@ services:
     depends_on:
       - redis
 
+  mulesoft-digital-billing-ms:
+    image: api-ivr-mdw/mulesoft-digital-billing-ms:latest
+    build:
+      context: ..
+      dockerfile: ./Dockerfile
+      args: { APP_NAME: mulesoft-digital-billing-ms }
+    env_file:
+      - ./.env
+    environment:
+      APP_ENV: prod
+    depends_on:
+      - redis
+      
   redis:
     image: redis:7-alpine
     ports:

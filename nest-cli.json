@@ -55,6 +55,15 @@
         "tsConfigPath": "apps/mulesoft-customer-ms/tsconfig.app.json"
       }
     },
+    "mulesoft-digital-billing-ms": {
+      "type": "application",
+      "root": "apps/mulesoft-digital-billing-ms",
+      "entryFile": "main",
+      "sourceRoot": "apps/mulesoft-digital-billing-ms/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/mulesoft-digital-billing-ms/tsconfig.app.json"
+      }
+    },
     "redis": {
       "type": "library",
       "root": "libs/redis",

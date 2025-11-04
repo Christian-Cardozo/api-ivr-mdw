@@ -57,6 +57,15 @@ services:
       mode: replicated
       replicas: 1
       restart_policy: { condition: any }
+  
+  mulesoft-digital-billing-ms:
+    image: api-ivr-mdw/mulesoft-digital-billing-ms:latest
+    env_file: ./.env    
+    networks: [ivr-net]
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy: { condition: any }
 
   redis:
     image: redis:7-alpine

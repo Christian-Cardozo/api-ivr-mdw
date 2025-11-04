@@ -27,6 +27,23 @@ import { ResilienceModule } from '@app/resilience';
             timeout: 60000,
           },
         }),
+        
+      },
+      {
+        name: 'MULESOFT_DIGITAL_BILLING_MS',
+        imports: [GlobalConfigModule],        // <- necesario para el factory
+        inject: [ConfigService],
+        useFactory: async (config: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: config.get<string>('MULESOFT_DIGITAL_BILLING_MS_HOST', 'localhost'),
+            port: config.get<number>('MULESOFT_DIGITAL_BILLING_MS_PORT', 3001),
+            retryAttempts: 10,
+            retryDelay: 3000,
+            timeout: 60000,
+          },
+        }),
+        
       },
     ]),
   ],
