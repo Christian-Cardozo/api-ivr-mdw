@@ -23,6 +23,7 @@ services:
       MULESOFT_CUSTOMER_MS_HOST: ${MULESOFT_CUSTOMER_MS_HOST}
       MULESOFT_CUSTOMER_MS_PORT: ${MULESOFT_CUSTOMER_MS_PORT}          
       MULESOFT_CLIENT_ID: ${MULESOFT_CLIENT_ID}
+      MULESOFT_CORPOCONTACT_CLIENT_ID: ${MULESOFT_CORPOCONTACT_CLIENT_ID}
       HOST: ${HOST}
     networks: [ivr-net, traefik-public]
     # En Linux prod podés usar ingress (shorthand):
