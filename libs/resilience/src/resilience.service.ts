@@ -1,4 +1,4 @@
-import { Injectable, Logger, RequestTimeoutException } from '@nestjs/common';
+import { HttpException, Injectable, Logger, RequestTimeoutException } from '@nestjs/common';
 import { CircuitBreakerService } from './circuit-breaker/circuit-breaker.service';
 import { NonRetryableError } from '@app/common/errors';
 import { ResilienceConfig } from './resilience.interface';
@@ -6,9 +6,9 @@ import { ResilienceConfig } from './resilience.interface';
 @Injectable()
 export class ResilienceService {
 
-    private readonly logger = new Logger(ResilienceService.name);        
+    private readonly logger = new Logger(ResilienceService.name);
 
-    constructor(private readonly circuitBreakerService: CircuitBreakerService){}
+    constructor(private readonly circuitBreakerService: CircuitBreakerService) { }
 
     async execute<T>(
         key: string,
@@ -16,12 +16,12 @@ export class ResilienceService {
         config: ResilienceConfig = {}
     ): Promise<T> {
 
-        if(config.circuitBreakerEnabled) {
+        if (config.circuitBreakerEnabled) {
             return this.circuitBreakerService.execute(key, () => this.executeWithRetry(key, fn, config));
         }
         else {
             return this.executeWithRetry(key, fn, config);
-        }        
+        }
     }
 
 
@@ -61,6 +61,10 @@ export class ResilienceService {
 
                 if (!retryOn(error)) {
                     this.logger.warn(`❌ Error no reintentable para ${key}`);
+                    if (error instanceof HttpException || error?.getStatus?.()) {
+                        throw error;
+                    }
+                    
                     throw new NonRetryableError(error);
                 }
 
