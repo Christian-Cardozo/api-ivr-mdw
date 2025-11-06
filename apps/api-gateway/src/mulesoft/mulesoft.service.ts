@@ -36,8 +36,7 @@ export class MulesoftService {
     return this.mulesoftCustomerClient.send<string, { type: string, dni: string }>('get-by-dni', { type, dni })
   }
 
-  getMulesoftDigitalBilling(body: any): Observable<string> {
-    console.log('asdasdasdasd')
+  getMulesoftDigitalBilling(body: any): Observable<string> {    
     return this.mulesoftDigitalBillingClient.send<string, any>('digital-billing', body)
   }
 
