@@ -1,0 +1,39 @@
+deploy-dev:
+  extends: .deploy-template
+  rules: [ { if: '$CI_COMMIT_BRANCH == "dev"' } ]
+  environment: { name: development }
+  variables:
+    ENV_NAME: "development"
+    STACK_NAME: "ivr-stack-dev"
+    IMAGE_TAG: "dev"
+    HOST: "dev-gestionivr.slz"
+
+deploy-preprod:
+  extends: .deploy-template
+  rules: [ { if: '$CI_COMMIT_BRANCH == "preprod"' } ]
+  environment: { name: preproduction }
+  variables:
+    ENV_NAME: "preproduction"
+    STACK_NAME: "ivr-stack-preprod"
+    IMAGE_TAG: "preprod"
+    HOST: "prepro-gestionivr.slz"
+
+deploy-slz:
+  extends: .deploy-template
+  rules: [ { if: '$CI_COMMIT_BRANCH == "prod"' } ]
+  environment: { name: production }
+  variables:
+    ENV_NAME: "production"
+    STACK_NAME: "ivr-stack-slz"
+    IMAGE_TAG: "prod"
+    HOST: "gestionivr.slz"
+
+deploy-hor:
+  extends: .deploy-template
+  rules: [ { if: '$CI_COMMIT_BRANCH == "prod"' } ]
+  environment: { name: production }
+  variables:
+    ENV_NAME: "production"
+    STACK_NAME: "ivr-stack-hor"
+    IMAGE_TAG: "prod"
+    HOST: "gestionivr.hor"

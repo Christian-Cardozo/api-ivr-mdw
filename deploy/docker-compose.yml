@@ -1,6 +1,6 @@
 services:
   api-gateway:
-    image: api-ivr-mdw/api-gateway:latest
+    image: api-gateway:latest
     build:
       context: ..
       dockerfile: ./Dockerfile
@@ -16,7 +16,7 @@ services:
       - redis
 
   mulesoft-customer-ms:
-    image: api-ivr-mdw/mulesoft-customer-ms:latest
+    image: mulesoft-customer-ms:latest
     build:
       context: ..
       dockerfile: ./Dockerfile
@@ -29,7 +29,7 @@ services:
       - redis
 
   mulesoft-digital-billing-ms:
-    image: api-ivr-mdw/mulesoft-digital-billing-ms:latest
+    image: mulesoft-digital-billing-ms:latest
     build:
       context: ..
       dockerfile: ./Dockerfile

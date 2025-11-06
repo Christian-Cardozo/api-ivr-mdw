@@ -1,0 +1,29 @@
+build-prod-api-gateway:
+  extends: .build-template
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "prod"'
+      changes: [ "apps/api-gateway/**", "libs/**", "Dockerfile" ]
+  variables:
+    IMAGE_TAG: "prod"
+    APP_NAME: "api-gateway"
+    IMAGE_NAME: "api-gateway"
+
+build-prod-mulesoft-customer-ms:
+  extends: .build-template
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "prod"'
+      changes: [ "apps/mulesoft-customer-ms/**", "libs/**", "Dockerfile" ]
+  variables:
+    IMAGE_TAG: "prod"
+    APP_NAME: "mulesoft-customer-ms"
+    IMAGE_NAME: "mulesoft-customer-ms"
+
+build-prod-mulesoft-digital-billing-ms:
+  extends: .build-template
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "prod"'
+      changes: [ "apps/mulesoft-digital-billing-ms/**", "libs/**", "Dockerfile" ]
+  variables:
+    IMAGE_TAG: "prod"
+    APP_NAME: "mulesoft-digital-billing-ms"
+    IMAGE_NAME: "mulesoft-digital-billing-ms"
