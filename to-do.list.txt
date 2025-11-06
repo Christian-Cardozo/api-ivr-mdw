@@ -10,5 +10,5 @@
 - ✅(mule-ms) agregar logica de depurado de response como esta actualmente en la api
 - ✅(all) agregar validationpipes para los params recibidos desde el cliente
 - ✅(env) validar que variables se definen como entorno y cuales simplemente se harcodean
-- (ci) corregir doble /api-ivr-mdw en el build y deploy
+- ✅(ci) corregir doble /api-ivr-mdw en el build y deploy
 - (ci) agregar los hostname que faltan a los labels de traefik
