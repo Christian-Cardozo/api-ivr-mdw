@@ -7,6 +7,7 @@ import { AuthClientModule } from '@app/auth-client';
 import { MulesoftController } from './mulesoft.controller';
 import { MulesoftService } from './mulesoft.service';
 import { ResilienceModule } from '@app/resilience';
+import { MsSupervisor } from './ms-supervisor.provider';
 
 @Module({
   imports: [
@@ -48,6 +49,6 @@ import { ResilienceModule } from '@app/resilience';
     ]),
   ],
   controllers: [MulesoftController],
-  providers: [MulesoftService],
+  providers: [MulesoftService, MsSupervisor],
 })
 export class MulesoftModule {}

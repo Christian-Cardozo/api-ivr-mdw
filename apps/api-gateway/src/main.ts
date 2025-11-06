@@ -22,6 +22,8 @@ async function bootstrap() {
   const host = configService.get<string>('APP_HOST', '0.0.0.0');
 
   app.useGlobalInterceptors(new RpcToHttpInterceptor());
+  app.enableShutdownHooks();
+  
   await app.listen(port, host);
   logger.log(`🚀 Application running on http://${host}:${port}/api/ivr-mdw`);
 }

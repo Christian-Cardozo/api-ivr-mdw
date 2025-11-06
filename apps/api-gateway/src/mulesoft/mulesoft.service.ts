@@ -13,10 +13,7 @@ export class MulesoftService {
   private readonly corpoContactClientId: string;
   private readonly baseUrl: string;
   private readonly env: string;
-  private readonly additionalOrderingBaseUrl: string;
   private hb?: NodeJS.Timeout;
-
-
 
   constructor(
     private readonly authService: AuthClientService,
@@ -25,46 +22,49 @@ export class MulesoftService {
     @Inject('MULESOFT_CUSTOMER_MS') private readonly mulesoftCustomerClient: ClientProxy,
     @Inject('MULESOFT_DIGITAL_BILLING_MS') private readonly mulesoftDigitalBillingClient: ClientProxy,
   ) {
+    this.baseUrl = this.configService.get<string>('MULESOFT_BASE_URL') || '';
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
     this.corpoContactClientId = this.configService.get<string>('MULESOFT_CORPOCONTACT_CLIENT_ID') || '';
-    this.baseUrl = this.configService.get<string>('MULESOFT_BASE_URL') || '';
-    this.additionalOrderingBaseUrl = this.configService.get<string>('MULESOFT_ADDITIONALORDERING_BASE_URL') || '';
     this.env = this.configService.get<string>('APP_ENV') || '';
   }
 
-  async onModuleInit() {
-    await this.ensureConnected();
-    this.startHeartbeat(); // evita idle-close “silencioso”
-  }
-
-  onModuleDestroy() {
-    if (this.hb) clearInterval(this.hb);
-    this.mulesoftCustomerClient.close();
-  }
-
-  private async ensureConnected() {
-    try {
-      await this.mulesoftCustomerClient.connect();
-      this.logger.log('TCP client conectado');
-    } catch (e) {
-      this.logger.warn(`Fallo connect(): ${e?.code || e?.message}. Reintentando...`);
-      setTimeout(() => this.ensureConnected(), 1000);
+  /*
+    async onModuleInit() {
+      await this.ensureConnected();
+      this.startHeartbeat(); // evita idle-close “silencioso”
     }
-  }
-
-  private startHeartbeat() {
-    // “ping” cada 15s, timeout 5s. Si falla, forzá reconnect en el próximo send()
-    this.hb = setInterval(async () => {
+  
+    onModuleDestroy() {
+      if (this.hb) clearInterval(this.hb);
+      this.mulesoftCustomerClient.close();
+    }
+  
+    private async ensureConnected() {
       try {
-        await firstValueFrom(
-          this.mulesoftCustomerClient.send<string, string>('ping', 'ok').pipe(
-            timeout(5000),
-            catchError(() => of('err')),
-          ),
-        );
-      } catch { /* no-op */ }
-    }, 15000);
-  }
+        await this.mulesoftCustomerClient.connect();
+        this.logger.log('TCP client conectado');
+      } catch (e) {
+        this.logger.warn(`Fallo connect(): ${e?.code || e?.message}. Reintentando...`);
+        setTimeout(() => this.ensureConnected(), 1000);
+      }
+    }
+  
+    private startHeartbeat() {
+      // “ping” cada 15s, timeout 5s. Si falla, forzá reconnect en el próximo send()
+      this.hb = setInterval(async () => {
+        try {
+          await firstValueFrom(
+            this.mulesoftCustomerClient.send<string, string>('ping', 'ok').pipe(
+              timeout(5000),
+              catchError(() => of('err')),
+            ),
+          );
+        } catch {
+          //no-op 
+        }
+      }, 15000);
+    }
+  */
 
   getMulesoftCustomerByANI(ani: string): Observable<string> {
     return this.mulesoftCustomerClient.send<string, string>('get-by-ani', ani);
@@ -187,7 +187,7 @@ export class MulesoftService {
     };
 
     const response = await fetch(url, {
-      method: 'GET',
+      method: 'POST',
       headers: headers,
       body: body,
       signal
@@ -309,7 +309,7 @@ export class MulesoftService {
   async getMulesoftAdditionalOrdering(params: any, body: any) {
 
     const url = `${this.baseUrl}/prod-order-mngmt-papi-${this.env}/api/v1/additionalOrder`
-        
+
     return this.resilienceService.execute(
       'additional-ordering',
       (signal) => this.fetchAdditionalOrdering(params, body, url, signal),
@@ -330,7 +330,7 @@ export class MulesoftService {
       'sourceApplication': 'IVR',
       'sourceComponent': 'Activacion Pack',
     };
-    
+
     const response = await fetch(url, {
       method: 'POST',
       headers: headers,
@@ -339,7 +339,7 @@ export class MulesoftService {
     })
 
     if (!response.ok) {
-      const txt = await response.text();      
+      const txt = await response.text();
       throw new HttpException(txt || 'Upstream error', response.status);
     }
 
