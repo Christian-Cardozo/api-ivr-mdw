@@ -22,8 +22,8 @@ build-dev-mulesoft-customer-ms:
       when: on_success
     - if: '$CI_COMMIT_BRANCH == "dev"'
       changes:
-        - "apps/api-gateway/**/*"
-        - "apps/api-gateway/**"
+        - "apps/mulesoft-customer-ms/**/*"        
+        - "apps/mulesoft-customer-ms/**"
         - "libs/**/*"
         - "Dockerfile"
       when: on_success
@@ -39,8 +39,8 @@ build-dev-mulesoft-digital-billing-ms:
       when: on_success
     - if: '$CI_COMMIT_BRANCH == "dev"'
       changes:
-        - "apps/api-gateway/**/*"
-        - "apps/api-gateway/**"
+        - "apps/mulesoft-digital-billing-ms/**/*"        
+        - "apps/mulesoft-digital-billing-ms/**"
         - "libs/**/*"
         - "Dockerfile"
       when: on_success
