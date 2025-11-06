@@ -1,6 +1,8 @@
 build-preprod-api-gateway:
   extends: .build-template
   rules:
+    - if: '$CI_COMMIT_BRANCH == "preprod" && $FORCE_BUILD == "1"'
+      when: on_success
     - if: '$CI_COMMIT_BRANCH == "preprod"'
       changes: [ "apps/api-gateway/**", "libs/**", "Dockerfile" ]
       when: on_success    
@@ -14,6 +16,8 @@ build-preprod-api-gateway:
 build-preprod-mulesoft-customer-ms:
   extends: .build-template
   rules:
+    - if: '$CI_COMMIT_BRANCH == "preprod" && $FORCE_BUILD == "1"'
+      when: on_success
     - if: '$CI_COMMIT_BRANCH == "preprod"'
       changes: [ "apps/mulesoft-customer-ms/**", "libs/**", "Dockerfile" ]
       when: on_success    
@@ -27,6 +31,8 @@ build-preprod-mulesoft-customer-ms:
 build-preprod-mulesoft-digital-billing-ms:
   extends: .build-template
   rules:
+    - if: '$CI_COMMIT_BRANCH == "preprod" && $FORCE_BUILD == "1"'
+      when: on_success
     - if: '$CI_COMMIT_BRANCH == "preprod"'
       changes: [ "apps/mulesoft-digital-billing-ms/**", "libs/**", "Dockerfile" ]
       when: on_success    
