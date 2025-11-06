@@ -1,17 +1,7 @@
 build-dev-api-gateway:
   extends: .build-template
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "dev" && $FORCE_BUILD == "1"'
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH == "dev"'
-      changes:
-        compare_to: 'refs/heads/dev@{1}'
-        paths:
-          - "apps/api-gateway/**/*"
-          - "apps/api-gateway/**"
-          - "libs/**/*"
-          - "Dockerfile"
-      when: on_success    
+  rules:    
+    - if: '$CI_COMMIT_BRANCH == "dev"'         
   variables:
     IMAGE_TAG: "dev"
     APP_NAME: "api-gateway"
@@ -19,18 +9,8 @@ build-dev-api-gateway:
 
 build-dev-mulesoft-customer-ms:
   extends: .build-template
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "dev" && $FORCE_BUILD == "1"'
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH == "dev"'
-      changes:
-        compare_to: 'refs/heads/dev@{1}'
-        paths:
-          - "apps/mulesoft-customer-ms/**/*"        
-          - "apps/mulesoft-customer-ms/**"
-          - "libs/**/*"
-          - "Dockerfile"
-      when: on_success    
+  rules:    
+    - if: '$CI_COMMIT_BRANCH == "dev"'       
   variables:
     IMAGE_TAG: "dev"
     APP_NAME: "mulesoft-customer-ms"
@@ -38,18 +18,8 @@ build-dev-mulesoft-customer-ms:
 
 build-dev-mulesoft-digital-billing-ms:
   extends: .build-template
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "dev" && $FORCE_BUILD == "1"'
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH == "dev"'
-      changes:
-        compare_to: 'refs/heads/dev@{1}'
-        paths:
-          - "apps/mulesoft-digital-billing-ms/**/*"        
-          - "apps/mulesoft-digital-billing-ms/**"
-          - "libs/**/*"
-          - "Dockerfile"
-      when: on_success    
+  rules:    
+    - if: '$CI_COMMIT_BRANCH == "dev"'          
   variables:
     IMAGE_TAG: "dev"
     APP_NAME: "mulesoft-digital-billing-ms"

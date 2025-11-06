@@ -9,5 +9,4 @@ stages: [ build, deploy ]
 
 workflow:
   rules:
-    - if: '$CI_COMMIT_BRANCH =~ /^(dev|preprod|prod)$/'
-    - when: never
+    - if: '$CI_COMMIT_BRANCH =~ /^(dev|preprod|prod)$/'    

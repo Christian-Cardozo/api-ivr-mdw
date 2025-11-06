@@ -6,8 +6,7 @@ variables:
   https_proxy: "http://proxyappl.telecom.arg.telecom.com.ar:8080"
   no_proxy: "localhost,127.0.0.1"
   DOCKER_BUILDKIT: "1"
-  COMPOSE_DOCKER_CLI_BUILD: "1"
-  GIT_DEPTH: "0"
+  COMPOSE_DOCKER_CLI_BUILD: "1"  
 
 .docker_prereqs: &docker_prereqs
   - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
