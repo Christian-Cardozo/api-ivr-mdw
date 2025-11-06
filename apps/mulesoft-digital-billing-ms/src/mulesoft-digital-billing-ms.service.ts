@@ -21,11 +21,15 @@ export class MulesoftDigitalBillingMsService {
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
     this.env = this.configService.get<string>('APP_ENV') || '';
 
+    let config: any = {};
+    try {
+      config = JSON.parse(this.configService.get<string>('MULESOFT_DIGITAL_BILLING_CONFIG') || '{}');
+    } catch {
+      config = {};
+    }
+
     this.ResilienceConfig = {
-      maxRetries: this.configService.get<number>('MULESOFT_DIGITAL_BILLING_RETRIES', 2),
-      timeoutMs: this.configService.get<number>('MULESOFT_DIGITAL_BILLING_TIMEOUT_MS', 5000),
-      retryDelayMs: this.configService.get<number>('MULESOFT_DIGITAL_BILLING_RETRY_DELAY_MS', 1000),
-      circuitBreakerEnabled: this.configService.get<boolean>('MULESOFT_DIGITAL_BILLING_CB_ENABLED') || false,
+      ...config,
       retryOn: (error) => this.shouldRetry(error),
     };
   }
@@ -44,15 +48,17 @@ export class MulesoftDigitalBillingMsService {
   private async fetchPayment(body: any, url: string, signal?: AbortSignal): Promise<string> {
     const token = await this.authService.getToken();
 
+    const xcorrelationid = `test-correlation-id-${Date.now()}`;
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
       client_id: this.clientId,
-      /*'x-correlation-id': `${xcorrelationid}`,
+      'x-correlation-id': `${xcorrelationid}`,
       'currentApplication': `IVR_SOS`,
       'currentComponent': `IVR_SOS`,
       'sourceApplication': 'IVR_SOS',
-      'sourceComponent': 'Loan_SOS',*/
+      'sourceComponent': 'Loan_SOS',
     };
 
     try {

@@ -12,4 +12,9 @@ export class ApiGatewayController {
     return this.apiGatewayService.getHello();
   }
 
+  @Get('env')
+  getEnv() {    
+    return this.apiGatewayService.getEnv();
+  }
+
 }
