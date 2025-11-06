@@ -24,6 +24,7 @@ export class MulesoftController {
   }
 
   @Post('cancellation-process')
+  @XmlResponse()
   getMulesoftCancellation(
     @Query() params: CancellationDto,
     @Body() body: any
@@ -40,16 +41,19 @@ export class MulesoftController {
   }
 
   @Get('payment-method')
+  @XmlResponse()
   getMulesoftPaymentMethod() {
     return this.mulesoftService.getMulesoftPaymentMethod();
   }
 
   @Get('billing-account-debt')
+  @XmlResponse()
   getMulesoftBillingAccountDebt() {
     return this.mulesoftService.getMulesoftBillingAccountDebt();
   }
 
   @Get('billing-account-balance')
+  @XmlResponse()
   getMulesoftBillingAccountBalance() {
     return this.mulesoftService.getMulesoftBillingAccountBalance();
   }

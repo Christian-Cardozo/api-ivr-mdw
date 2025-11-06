@@ -60,7 +60,7 @@ export class CancellationDto {
 
 export class LoansOfferringDto {
   @IsOptional()
-  'x-correlation-id'?: string;
+  xcorrelationid?: string;
 }
 
 export class YoizenDto {
@@ -75,7 +75,7 @@ export class YoizenDto {
 
 export class DigitalBillingDto {
   @IsOptional()
-  'x-correlation-id'?: string;
+  xcorrelationid: string;
 }
 
 export class AdditionalOrderingDto {
