@@ -19,11 +19,9 @@ variables:
   script:
     - >
       docker build --pull
-      --build-arg APP_NAME=${APP_NAME}
-      -t $CI_REGISTRY_IMAGE/${IMAGE_NAME}:${IMAGE_TAG}
+      --build-arg APP_NAME=${APP_NAME}      
       -t $CI_REGISTRY_IMAGE/${IMAGE_NAME}:${IMAGE_TAG}-${CI_COMMIT_SHORT_SHA}
-      -f Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE/${IMAGE_NAME}:${IMAGE_TAG}
+      -f Dockerfile .    
     - docker push $CI_REGISTRY_IMAGE/${IMAGE_NAME}:${IMAGE_TAG}-${CI_COMMIT_SHORT_SHA}
 
 .deploy-template:
@@ -32,7 +30,7 @@ variables:
   before_script: *docker_prereqs
   script:
     - echo "Deploy $ENV_NAME via Swarm"
-    - export IMAGE_TAG="${IMAGE_TAG}"      # sin -$CI_COMMIT_SHORT_SHA
-    - docker stack deploy --with-registry-auth --resolve-image changed -c deploy/docker-stack.yml "$STACK_NAME"
-    #- docker stack deploy --with-registry-auth -c deploy/docker-stack.yml "$STACK_NAME"
+    - export IMAGE_TAG="${IMAGE_TAG}-${CI_COMMIT_SHORT_SHA}"
+    - export HOST=${HOST}
+    - docker stack deploy --with-registry-auth -c deploy/docker-stack.yml "$STACK_NAME"
   dependencies: []
