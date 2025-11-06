@@ -246,18 +246,18 @@ export class MulesoftService {
   }
 
   async fetchYoizen(body: any, url: string, signal?: AbortSignal): Promise<any> {
-    const token = await this.authService.getToken();
+    const token = await this.authService.getCustomToken('idp:mule:yoizen:token', 'MULESOFT_CORPOCONTACT_CLIENT_ID');
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
-      //client_id: this.clientId,      
+      client_id: this.corpoContactClientId.split(':')[0],      
     };
 
     const response = await fetch(url, {
       method: 'POST',
       headers: headers,
-      body: body,
+      body: JSON.stringify(body),
       signal
     })
 
