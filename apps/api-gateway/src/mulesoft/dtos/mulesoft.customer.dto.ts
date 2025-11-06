@@ -7,7 +7,7 @@ export class AniParamDto {
 }
 
 export class DniParamDto {
-  @Length(7, 11, { message: 'El DNI debe tener entre 7 y 11 dígitos' })
+  @Length(6, 11, { message: 'El DNI debe tener entre 6 y 11 dígitos' })
   @IsNumberString({}, { message: 'El DNI debe contener solo números' })
   dni: string;
 
