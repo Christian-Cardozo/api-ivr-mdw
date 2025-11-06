@@ -26,45 +26,7 @@ export class MulesoftService {
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
     this.corpoContactClientId = this.configService.get<string>('MULESOFT_CORPOCONTACT_CLIENT_ID') || '';
     this.env = this.configService.get<string>('APP_ENV') || '';
-  }
-
-  /*
-    async onModuleInit() {
-      await this.ensureConnected();
-      this.startHeartbeat(); // evita idle-close “silencioso”
-    }
-  
-    onModuleDestroy() {
-      if (this.hb) clearInterval(this.hb);
-      this.mulesoftCustomerClient.close();
-    }
-  
-    private async ensureConnected() {
-      try {
-        await this.mulesoftCustomerClient.connect();
-        this.logger.log('TCP client conectado');
-      } catch (e) {
-        this.logger.warn(`Fallo connect(): ${e?.code || e?.message}. Reintentando...`);
-        setTimeout(() => this.ensureConnected(), 1000);
-      }
-    }
-  
-    private startHeartbeat() {
-      // “ping” cada 15s, timeout 5s. Si falla, forzá reconnect en el próximo send()
-      this.hb = setInterval(async () => {
-        try {
-          await firstValueFrom(
-            this.mulesoftCustomerClient.send<string, string>('ping', 'ok').pipe(
-              timeout(5000),
-              catchError(() => of('err')),
-            ),
-          );
-        } catch {
-          //no-op 
-        }
-      }, 15000);
-    }
-  */
+  }  
 
   getMulesoftCustomerByANI(ani: string): Observable<string> {
     return this.mulesoftCustomerClient.send<string, string>('get-by-ani', ani);
@@ -106,7 +68,7 @@ export class MulesoftService {
     const response = await fetch(url, {
       method: 'POST',
       headers: headers,
-      body,
+      body: JSON.stringify(body),
     })
 
     if (!response.ok) {

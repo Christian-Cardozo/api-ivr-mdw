@@ -49,11 +49,7 @@ export class ContactDto {
   ani: string;
 }
 
-export class CancellationDto {
-  @Length(10, 10, { message: 'El ANI debe tener exactamente 10 dígitos' })
-  @IsNumberString({}, { message: 'El ANI debe contener solo números' })
-  ani: string;
-
+export class CancellationDto {  
   @IsOptional()
   'x-correlation-id'?: string;
     

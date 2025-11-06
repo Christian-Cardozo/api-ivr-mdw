@@ -63,10 +63,14 @@ export class MulesoftDigitalBillingMsService {
 
     try {
 
+      console.log(`⏳ Enviando solicitud a Mulesoft Digital Billing MS: ${url}`);
+      console.log(`Headers: ${JSON.stringify(headers)}`);
+      console.log(`Body: ${JSON.stringify(body)}`);
+
       const response = await fetch(url, {
         method: 'POST',
         headers,
-        body,
+        body: JSON.stringify(body),
         signal,
       });
 
