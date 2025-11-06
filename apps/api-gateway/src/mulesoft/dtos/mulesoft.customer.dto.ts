@@ -75,7 +75,7 @@ export class YoizenDto {
 
 export class DigitalBillingDto {
   @IsOptional()
-  xcorrelationid: string;
+  xcorrelationid?: string;
 }
 
 export class AdditionalOrderingDto {

@@ -136,7 +136,7 @@ export class MulesoftService {
 
   async fetchLoansOffering(params: any, body: any, url: string, signal?: AbortSignal): Promise<any> {
     const token = await this.authService.getToken();
-    const { xcorrelationid, } = params
+    const { xcorrelationid } = params
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -152,7 +152,7 @@ export class MulesoftService {
     const response = await fetch(url, {
       method: 'POST',
       headers: headers,
-      body: body,
+      body: JSON.stringify(body),
       signal
     })
 
