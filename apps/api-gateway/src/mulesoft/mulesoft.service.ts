@@ -37,6 +37,7 @@ export class MulesoftService {
   }
 
   getMulesoftDigitalBilling(body: any): Observable<string> {
+    console.log('asdasdasdasd')
     return this.mulesoftDigitalBillingClient.send<string, any>('digital-billing', body)
   }
 

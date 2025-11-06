@@ -51,7 +51,7 @@ export class ContactDto {
 
 export class CancellationDto {  
   @IsOptional()
-  'x-correlation-id'?: string;
+  xcorrelationid?: string;
     
   @IsOptional()  
   @IsIn(['accept', 'reject'])

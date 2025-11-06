@@ -90,6 +90,7 @@ export class MulesoftController {
   getMulesoftDigitalBilling(
     @Body() body: DigitalBillingDto
   ) {
+    console.log('asdasdasdasd')
     return this.mulesoftService.getMulesoftDigitalBilling(body);
   }
 
