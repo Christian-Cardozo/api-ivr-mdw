@@ -5,10 +5,12 @@ build-prod-api-gateway:
       when: on_success
     - if: '$CI_COMMIT_BRANCH == "prod"'
       changes:
-        - "apps/api-gateway/**/*"
-        - "apps/api-gateway/**"
-        - "libs/**/*"
-        - "Dockerfile"
+        compare_to: 'refs/heads/prod@{1}'
+        paths:
+          - "apps/api-gateway/**/*"
+          - "apps/api-gateway/**"
+          - "libs/**/*"
+          - "Dockerfile"
       when: on_success
   variables:
     IMAGE_TAG: "prod"
@@ -22,10 +24,12 @@ build-prod-mulesoft-customer-ms:
       when: on_success
     - if: '$CI_COMMIT_BRANCH == "prod"'
       changes:
-        - "apps/mulesoft-customer-ms/**/*"        
-        - "apps/mulesoft-customer-ms/**"
-        - "libs/**/*"
-        - "Dockerfile"
+        compare_to: 'refs/heads/prod@{1}'
+        paths:
+          - "apps/mulesoft-customer-ms/**/*"
+          - "apps/mulesoft-customer-ms/**"
+          - "libs/**/*"
+          - "Dockerfile"
       when: on_success
   variables:
     IMAGE_TAG: "prod"
@@ -39,10 +43,12 @@ build-prod-mulesoft-digital-billing-ms:
       when: on_success
     - if: '$CI_COMMIT_BRANCH == "prod"'
       changes:
-        - "apps/mulesoft-digital-billing-ms/**/*"        
-        - "apps/mulesoft-digital-billing-ms/**"
-        - "libs/**/*"
-        - "Dockerfile"
+        compare_to: 'refs/heads/prod@{1}'
+        paths:
+          - "apps/mulesoft-digital-billing-ms/**/*"
+          - "apps/mulesoft-digital-billing-ms/**"
+          - "libs/**/*"
+          - "Dockerfile"
       when: on_success
   variables:
     IMAGE_TAG: "prod"

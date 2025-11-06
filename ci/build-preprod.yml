@@ -5,11 +5,13 @@ build-preprod-api-gateway:
       when: on_success
     - if: '$CI_COMMIT_BRANCH == "preprod"'
       changes:
-        - "apps/api-gateway/**/*"
-        - "apps/api-gateway/**"
-        - "libs/**/*"
-        - "Dockerfile"
-      when: on_success
+        compare_to: 'refs/heads/preprod@{1}'
+        paths:
+          - "apps/api-gateway/**/*"
+          - "apps/api-gateway/**"
+          - "libs/**/*"
+          - "Dockerfile"
+      when: on_success    
   variables:
     IMAGE_TAG: "preprod"
     APP_NAME: "api-gateway"
@@ -22,10 +24,12 @@ build-preprod-mulesoft-customer-ms:
       when: on_success
     - if: '$CI_COMMIT_BRANCH == "preprod"'
       changes:
-        - "apps/mulesoft-customer-ms/**/*"        
-        - "apps/mulesoft-customer-ms/**"
-        - "libs/**/*"
-        - "Dockerfile"
+        compare_to: 'refs/heads/preprod@{1}'
+        paths:
+          - "apps/mulesoft-customer-ms/**/*"
+          - "apps/mulesoft-customer-ms/**"
+          - "libs/**/*"
+          - "Dockerfile"
       when: on_success
   variables:
     IMAGE_TAG: "preprod"
@@ -39,10 +43,12 @@ build-preprod-mulesoft-digital-billing-ms:
       when: on_success
     - if: '$CI_COMMIT_BRANCH == "preprod"'
       changes:
-        - "apps/mulesoft-digital-billing-ms/**/*"        
-        - "apps/mulesoft-digital-billing-ms/**"
-        - "libs/**/*"
-        - "Dockerfile"
+        compare_to: 'refs/heads/preprod@{1}'
+        paths:
+          - "apps/mulesoft-digital-billing-ms/**/*"
+          - "apps/mulesoft-digital-billing-ms/**"
+          - "libs/**/*"
+          - "Dockerfile"
       when: on_success
   variables:
     IMAGE_TAG: "preprod"
