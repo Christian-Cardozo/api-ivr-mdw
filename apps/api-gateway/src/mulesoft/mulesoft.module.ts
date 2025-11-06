@@ -38,7 +38,7 @@ import { MsSupervisor } from './ms-supervisor.provider';
           transport: Transport.TCP,
           options: {
             host: config.get<string>('MULESOFT_DIGITAL_BILLING_MS_HOST', 'localhost'),
-            port: config.get<number>('MULESOFT_DIGITAL_BILLING_MS_PORT', 3001),
+            port: config.get<number>('MULESOFT_DIGITAL_BILLING_MS_PORT', 3002),
             retryAttempts: 10,
             retryDelay: 3000,
             timeout: 60000,
