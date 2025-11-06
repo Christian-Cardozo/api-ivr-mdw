@@ -1,5 +1,6 @@
 deploy-dev:
   extends: .deploy-template
+  tags: [ ivr-dev-01 ]
   rules: [ { if: '$CI_COMMIT_BRANCH == "dev"' } ]
   environment: { name: development }
   variables:
@@ -10,6 +11,7 @@ deploy-dev:
 
 deploy-preprod:
   extends: .deploy-template
+  tags: [ ivr-preprod-01 ]
   rules: [ { if: '$CI_COMMIT_BRANCH == "preprod"' } ]
   environment: { name: preproduction }
   variables:
@@ -20,6 +22,7 @@ deploy-preprod:
 
 deploy-slz:
   extends: .deploy-template
+  tags: [ ivr-prod-slz ]
   rules: [ { if: '$CI_COMMIT_BRANCH == "prod"' } ]
   environment: { name: production }
   variables:
@@ -30,6 +33,7 @@ deploy-slz:
 
 deploy-hor:
   extends: .deploy-template
+  tags: [ ivr-prod-hor ]
   rules: [ { if: '$CI_COMMIT_BRANCH == "prod"' } ]
   environment: { name: production }
   variables:

@@ -3,6 +3,9 @@ build-prod-api-gateway:
   rules:
     - if: '$CI_COMMIT_BRANCH == "prod"'
       changes: [ "apps/api-gateway/**", "libs/**", "Dockerfile" ]
+      when: on_success    
+    - if: '$CI_COMMIT_BRANCH == "prod"'
+      when: never
   variables:
     IMAGE_TAG: "prod"
     APP_NAME: "api-gateway"
@@ -13,6 +16,9 @@ build-prod-mulesoft-customer-ms:
   rules:
     - if: '$CI_COMMIT_BRANCH == "prod"'
       changes: [ "apps/mulesoft-customer-ms/**", "libs/**", "Dockerfile" ]
+      when: on_success    
+    - if: '$CI_COMMIT_BRANCH == "prod"'
+      when: never
   variables:
     IMAGE_TAG: "prod"
     APP_NAME: "mulesoft-customer-ms"
@@ -23,6 +29,9 @@ build-prod-mulesoft-digital-billing-ms:
   rules:
     - if: '$CI_COMMIT_BRANCH == "prod"'
       changes: [ "apps/mulesoft-digital-billing-ms/**", "libs/**", "Dockerfile" ]
+      when: on_success    
+    - if: '$CI_COMMIT_BRANCH == "prod"'
+      when: never
   variables:
     IMAGE_TAG: "prod"
     APP_NAME: "mulesoft-digital-billing-ms"

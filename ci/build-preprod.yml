@@ -3,6 +3,9 @@ build-preprod-api-gateway:
   rules:
     - if: '$CI_COMMIT_BRANCH == "preprod"'
       changes: [ "apps/api-gateway/**", "libs/**", "Dockerfile" ]
+      when: on_success    
+    - if: '$CI_COMMIT_BRANCH == "preprod"'
+      when: never
   variables:
     IMAGE_TAG: "preprod"
     APP_NAME: "api-gateway"
@@ -13,6 +16,9 @@ build-preprod-mulesoft-customer-ms:
   rules:
     - if: '$CI_COMMIT_BRANCH == "preprod"'
       changes: [ "apps/mulesoft-customer-ms/**", "libs/**", "Dockerfile" ]
+      when: on_success    
+    - if: '$CI_COMMIT_BRANCH == "preprod"'
+      when: never
   variables:
     IMAGE_TAG: "preprod"
     APP_NAME: "mulesoft-customer-ms"
@@ -23,6 +29,9 @@ build-preprod-mulesoft-digital-billing-ms:
   rules:
     - if: '$CI_COMMIT_BRANCH == "preprod"'
       changes: [ "apps/mulesoft-digital-billing-ms/**", "libs/**", "Dockerfile" ]
+      when: on_success    
+    - if: '$CI_COMMIT_BRANCH == "preprod"'
+      when: never
   variables:
     IMAGE_TAG: "preprod"
     APP_NAME: "mulesoft-digital-billing-ms"

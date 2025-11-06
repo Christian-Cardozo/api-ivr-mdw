@@ -33,6 +33,6 @@ variables:
   script:
     - echo "Deploy $ENV_NAME via Swarm"
     - export IMAGE_TAG="${IMAGE_TAG}"      # sin -$CI_COMMIT_SHORT_SHA
-    # - docker stack deploy --with-registry-auth --resolve-image changed -c deploy/docker-stack.yml "$STACK_NAME"
-    - docker stack deploy --with-registry-auth -c deploy/docker-stack.yml "$STACK_NAME"
+    - docker stack deploy --with-registry-auth --resolve-image changed -c deploy/docker-stack.yml "$STACK_NAME"
+    #- docker stack deploy --with-registry-auth -c deploy/docker-stack.yml "$STACK_NAME"
   dependencies: []
