@@ -26,7 +26,7 @@ export class MulesoftService {
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
     this.corpoContactClientId = this.configService.get<string>('MULESOFT_CORPOCONTACT_CLIENT_ID') || '';
     this.env = this.configService.get<string>('APP_ENV') || '';
-  }  
+  }
 
   getMulesoftCustomerByANI(ani: string): Observable<string> {
     return this.mulesoftCustomerClient.send<string, string>('get-by-ani', ani);
@@ -36,8 +36,8 @@ export class MulesoftService {
     return this.mulesoftCustomerClient.send<string, { type: string, dni: string }>('get-by-dni', { type, dni })
   }
 
-  getMulesoftDigitalBilling(body: any): Observable<string> {    
-    return this.mulesoftDigitalBillingClient.send<string, any>('digital-billing', body)
+  getMulesoftDigitalBilling(params: any, body: any): Observable<string> {    
+    return this.mulesoftDigitalBillingClient.send<string, any>('digital-billing', { params, body })
   }
 
   async getMulesoftCancellation(params: any, body: any) {
@@ -250,7 +250,7 @@ export class MulesoftService {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
-      client_id: this.corpoContactClientId.split(':')[0],      
+      client_id: this.corpoContactClientId.split(':')[0],
     };
 
     const response = await fetch(url, {

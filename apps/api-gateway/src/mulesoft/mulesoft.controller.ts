@@ -92,9 +92,10 @@ export class MulesoftController {
   @Post('digital-billing-management')
   @XmlResponse()
   getMulesoftDigitalBilling(
-    @Body() body: DigitalBillingDto
+    @Query() params: DigitalBillingDto,
+    @Body() body: any,
   ) {    
-    return this.mulesoftService.getMulesoftDigitalBilling(body);
+    return this.mulesoftService.getMulesoftDigitalBilling(params, body);
   }
 
   @Post('additional-ordering')

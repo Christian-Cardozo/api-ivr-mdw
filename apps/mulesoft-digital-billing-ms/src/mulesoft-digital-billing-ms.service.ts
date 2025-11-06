@@ -34,21 +34,21 @@ export class MulesoftDigitalBillingMsService {
     };
   }
 
-  async payment(body: any): Promise<string> {
+  async payment(params: any, body: any): Promise<string> {
     const url = `${this.baseUrl}/digital-billing-mngmt-papi-${this.env}/v1/cyclic`;
 
     //console.log(this.ResilienceConfig)    
     return this.resilienceService.execute(
       'mule:payment',
-      (signal) => this.fetchPayment(body, url, signal),
+      (signal) => this.fetchPayment(params, body, url, signal),
       this.ResilienceConfig,
     );
   }
 
-  private async fetchPayment(body: any, url: string, signal?: AbortSignal): Promise<string> {
+  private async fetchPayment(params: any, body: any, url: string, signal?: AbortSignal): Promise<string> {
     const token = await this.authService.getToken();
-
-    const xcorrelationid = `test-correlation-id-${Date.now()}`;
+    
+    const { xcorrelationid } = params;
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
