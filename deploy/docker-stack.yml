@@ -12,25 +12,18 @@ services:
     image: ${CI_REGISTRY_IMAGE}/api-gateway:${IMAGE_TAG}
     environment:
       NODE_ENV: ${NODE_ENV}
-      APP_ENV:  ${APP_ENV}
-      APP_PORT: ${APP_PORT}
+      APP_ENV:  ${APP_ENV}      
       APP_HOST: ${APP_HOST}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}      
+      REDIS_HOST: ${REDIS_HOST}      
       IDP_URL: ${IDP_URL}
       IDP_USERKEY: ${IDP_USERKEY}       
       MULESOFT_BASE_URL: ${MULESOFT_BASE_URL}
-      MULESOFT_CUSTOMER_MS_HOST: ${MULESOFT_CUSTOMER_MS_HOST}
-      MULESOFT_CUSTOMER_MS_PORT: ${MULESOFT_CUSTOMER_MS_PORT}          
-      MULESOFT_DIGITAL_BILLING_MS_HOST: ${MULESOFT_DIGITAL_BILLING_MS_HOST}
-      MULESOFT_DIGITAL_BILLING_MS_PORT: ${MULESOFT_DIGITAL_BILLING_MS_PORT}          
+      MULESOFT_CUSTOMER_MS_HOST: ${MULESOFT_CUSTOMER_MS_HOST}      
+      MULESOFT_DIGITAL_BILLING_MS_HOST: ${MULESOFT_DIGITAL_BILLING_MS_HOST}      
       MULESOFT_CLIENT_ID: ${MULESOFT_CLIENT_ID}
       MULESOFT_CORPOCONTACT_CLIENT_ID: ${MULESOFT_CORPOCONTACT_CLIENT_ID}
       HOST: ${HOST}
-    networks: [ivr-net, traefik-public]
-    # En Linux prod podés usar ingress (shorthand):
-    # ports:
-    #  - "7000:3000"
+    networks: [ivr-net, traefik-public]    
     deploy:
       mode: replicated
       replicas: ${API_GATEWAY_REPLICAS}
@@ -70,8 +63,7 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV}
       APP_ENV:  ${APP_ENV}      
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}      
+      REDIS_HOST: ${REDIS_HOST}       
       IDP_URL: ${IDP_URL}
       IDP_USERKEY: ${IDP_USERKEY}
       MULESOFT_BASE_URL: ${MULESOFT_BASE_URL}      
@@ -94,8 +86,7 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV}
       APP_ENV:  ${APP_ENV}      
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}      
+      REDIS_HOST: ${REDIS_HOST}        
       IDP_URL: ${IDP_URL}
       IDP_USERKEY: ${IDP_USERKEY}
       MULESOFT_BASE_URL: ${MULESOFT_BASE_URL}      

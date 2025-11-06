@@ -14,7 +14,7 @@ import { ConfigService } from '@nestjs/config';
         const Redis = require('ioredis');
         const logger = new Logger('RedisModule');
         const host = config.get<string>('REDIS_HOST', 'localhost');
-        const port = config.get<number>('REDIS_PORT', 6379);
+        const port = 6379;
 
         const client = new Redis({
           host,
