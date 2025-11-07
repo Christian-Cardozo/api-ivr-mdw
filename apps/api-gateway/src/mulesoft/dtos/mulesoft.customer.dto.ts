@@ -83,4 +83,9 @@ export class AdditionalOrderingDto {
   xcorrelationid?: string;
 }
 
-
+export class CustumerCorpoDto {
+  @Length(11, 11, { message: 'El CUIT debe tener exactamente 11 dígitos' })
+  @IsNumberString({}, { message: 'El CUIT debe contener solo números' })
+  cuit: string;
+  
+}

@@ -308,6 +308,39 @@ export class MulesoftService {
     return await response.json();
   }
 
+   async getMulesoftCustomerManagementCorpo(cuit: string) {
+
+    const url = `${this.baseUrl}/customer-mngmt-papi-${this.env}/api/v1/customer?filtering=identificationId=${cuit}`
+
+    return this.resilienceService.execute(
+      'mule:customermanagementcorpo',
+      (signal) => this.fetchMulesoftCustomerManagementCorpo(url, signal),
+    )
+  }
+
+  async fetchMulesoftCustomerManagementCorpo(url: string, signal?: AbortSignal): Promise<any> {
+    const token = await this.authService.getToken();
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      client_id: this.clientId,
+    };
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: headers,
+      signal
+    })
+
+    if (!response.ok) {
+      const txt = await response.text();
+      throw new HttpException(txt || 'Upstream error', response.status);
+    }
+
+    return await response.json();
+  }
+
 
 }
 

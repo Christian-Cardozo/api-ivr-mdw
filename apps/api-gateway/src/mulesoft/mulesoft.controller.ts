@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { MulesoftService } from './mulesoft.service';
 import { XmlResponse } from '@app/xml/xml-response.decorator';
-import { AniParamDto, CustomerBillDto, DniParamDto, CbsProductInventoryDto, ContactDto, CancellationDto, LoansOfferringDto, YoizenDto, DigitalBillingDto, AdditionalOrderingDto } from './dtos/mulesoft.customer.dto';
+import { AniParamDto, CustomerBillDto, DniParamDto, CbsProductInventoryDto, ContactDto, CancellationDto, LoansOfferringDto, YoizenDto, DigitalBillingDto, AdditionalOrderingDto, CustumerCorpoDto } from './dtos/mulesoft.customer.dto';
 
 @Controller('mulesoft')
 export class MulesoftController {
@@ -107,5 +107,9 @@ export class MulesoftController {
     return this.mulesoftService.getMulesoftAdditionalOrdering(params, body);
   }
 
-
+ @Get('customer-management-corpo/:cuit')
+  @XmlResponse()
+  getMulesoftCustomerManagementCorpo(@Param() { cuit }: CustumerCorpoDto) {
+    return this.mulesoftService.getMulesoftCustomerManagementCorpo(cuit);
+  }
 }
