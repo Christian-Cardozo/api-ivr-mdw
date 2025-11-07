@@ -380,7 +380,44 @@ export class MulesoftService {
 
     return await response.json();
   }
+ //Mule Mora
 
+   async getMulesoftMora(accountIntegrationId: string) {
+
+    const url = `${this.baseUrl}/billing-account-mngmt-process-papi-${this.env}/v2/debtCollection?accountIntegrationId=${accountIntegrationId}`
+    return this.resilienceService.execute(
+      'mule:mora',
+      (signal) => this.fetchMulesoftMora(url, signal),
+    )
+  }
+
+  async fetchMulesoftMora(url: string, signal?: AbortSignal): Promise<any> {
+    const token = await this.authService.getToken();
+
+     const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      client_id: this.clientId,
+      'x-correlation-id': `${xcorrelationid}`,
+      'currentApplication': `IVR`,
+      'currentComponent': `IVR`,
+      'sourceApplication': 'IVR',
+      'sourceComponent': 'ConsultaMora',
+    };
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: headers,
+      signal
+    })
+
+    if (!response.ok) {
+      const txt = await response.text();
+      throw new HttpException(txt || 'Upstream error', response.status);
+    }
+
+    return await response.json();
+  }
 
 }
 

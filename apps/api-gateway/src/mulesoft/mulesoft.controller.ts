@@ -115,4 +115,10 @@ export class MulesoftController {
   getMulesoftCustomerManagementCorpo(@Param() { cuit }: CustumerCorpoDto) {
     return this.mulesoftService.getMulesoftCustomerManagementCorpo(cuit);
   }
+
+    @Get('debt-collection/:accountIntegrationId')
+  @XmlResponse()
+  getMulesoftMora(@Param() { accountIntegrationId }: any) {
+    return this.mulesoftService.getMulesoftMora(accountIntegrationId);
+  }
 }
