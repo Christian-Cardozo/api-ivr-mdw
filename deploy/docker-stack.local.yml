@@ -30,15 +30,15 @@ services:
         - "traefik.enable=true"
         
         # HTTP (7000)
-        - "traefik.http.routers.api-gateway-http.rule=Host(`local.api-ivr-mdw`) || Host(`localhost`)"
+        - "traefik.http.routers.api-gateway-http.rule=(Host(`local.api-ivr-mdw`) || Host(`localhost`)) && (PathPrefix(`/api/ivr-mdw`) || PathPrefix(`/health`))"
         - "traefik.http.routers.api-gateway-http.entrypoints=web"
         - "traefik.http.routers.api-gateway-http.service=api-gateway"
 
         # HTTPS (7443)
-        - "traefik.http.routers.api-gateway-https.rule=Host(`local.api-ivr-mdw`) || Host(`localhost`)"
+        - "traefik.http.routers.api-gateway-https.rule=(Host(`local.api-ivr-mdw`) || Host(`localhost`)) && (PathPrefix(`/api/ivr-mdw`) || PathPrefix(`/health`))"
         - "traefik.http.routers.api-gateway-https.entrypoints=websecure"
         - "traefik.http.routers.api-gateway-https.tls=true"        
-        - "traefik.http.routers.api-gateway-https.service=api-gateway" 
+        - "traefik.http.routers.api-gateway-https.service=api-gateway"         
 
         - "traefik.http.services.api-gateway.loadbalancer.server.port=3000"
         - "traefik.swarm.network=traefik-public"
@@ -48,6 +48,35 @@ services:
       timeout: 5s
       retries: 1
       start_period: 60s
+
+  api-internal:
+    image: api-internal:latest
+    env_file: ./.env    
+    networks: 
+      - ivr-net
+      - traefik-public    
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy: { condition: any }
+      update_config:
+        order: start-first
+      labels:
+        - "traefik.enable=true"
+        
+        # HTTP (7000)
+        - "traefik.http.routers.api-internal-http.rule=(Host(`local.api-ivr-int`) || Host(`localhost`)) && (PathPrefix(`/api/ivr-int`) || PathPrefix(`/health`))"
+        - "traefik.http.routers.api-internal-http.entrypoints=web"                
+        - "traefik.http.routers.api-internal-http.service=api-internal"
+
+        # HTTPS (7443)
+        - "traefik.http.routers.api-internal-https.rule=(Host(`local.api-ivr-int`) || Host(`localhost`)) && (PathPrefix(`/api/ivr-int`) || PathPrefix(`/health`))"
+        - "traefik.http.routers.api-internal-https.entrypoints=websecure"
+        - "traefik.http.routers.api-internal-https.tls=true"               
+        - "traefik.http.routers.api-internal-https.service=api-internal"         
+
+        - "traefik.http.services.api-internal.loadbalancer.server.port=3100"
+        - "traefik.swarm.network=traefik-public"    
 
   mulesoft-customer-ms:
     image: mulesoft-customer-ms:latest

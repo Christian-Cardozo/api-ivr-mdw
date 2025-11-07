@@ -19,6 +19,15 @@
         "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
       }
     },
+    "api-internal": {
+      "type": "application",
+      "root": "apps/api-internal",
+      "entryFile": "main",
+      "sourceRoot": "apps/api-internal/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/api-internal/tsconfig.app.json"
+      }
+    },
     "auth-client": {
       "type": "library",
       "root": "libs/auth-client",

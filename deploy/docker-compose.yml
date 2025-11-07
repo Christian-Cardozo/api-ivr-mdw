@@ -15,6 +15,19 @@ services:
       - mulesoft-customer-ms
       - redis
 
+  api-internal:
+    image: api-internal:latest
+    build:
+      context: ..
+      dockerfile: ./Dockerfile
+      args: { APP_NAME: api-internal }
+    env_file:
+      - ./.env
+    environment:
+      APP_ENV: prod
+    ports:
+      - "8081:3100"
+    
   mulesoft-customer-ms:
     image: mulesoft-customer-ms:latest
     build:
