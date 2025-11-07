@@ -40,10 +40,13 @@ export class MulesoftController {
     return this.mulesoftService.getMulesoftCustomerBill(params);
   }
 
-  @Get('payment-method')
+  @Post('payment-method')
   @XmlResponse()
-  getMulesoftPaymentMethod() {
-    return this.mulesoftService.getMulesoftPaymentMethod();
+  getMulesoftPaymentMethod(
+    @Query() params: any,
+    @Body() body: any
+  ) {
+    return this.mulesoftService.getMulesoftPaymentMethod(params, body);
   }
 
   @Get('billing-account-debt')

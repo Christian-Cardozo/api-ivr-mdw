@@ -144,6 +144,8 @@ importers:
 
   apps/api-gateway: {}
 
+  apps/api-internal: {}
+
   apps/mulesoft-customer-ms: {}
 
   apps/mulesoft-digital-billing-ms: {}

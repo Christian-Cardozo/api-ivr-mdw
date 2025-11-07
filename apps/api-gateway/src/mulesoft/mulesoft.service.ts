@@ -11,6 +11,7 @@ export class MulesoftService {
   private readonly logger = new Logger(MulesoftService.name);
   private readonly clientId: string;
   private readonly corpoContactClientId: string;
+  private readonly paymentMethodClientId: string;
   private readonly baseUrl: string;
   private readonly env: string;
   private hb?: NodeJS.Timeout;
@@ -25,6 +26,7 @@ export class MulesoftService {
     this.baseUrl = this.configService.get<string>('MULESOFT_BASE_URL') || '';
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
     this.corpoContactClientId = this.configService.get<string>('MULESOFT_CORPOCONTACT_CLIENT_ID') || '';
+    this.paymentMethodClientId = this.configService.get<string>('MULESOFT_PAYMENTMETHOD_CLIENT_ID') || '';
     this.env = this.configService.get<string>('APP_ENV') || '';
   }
 
@@ -112,8 +114,46 @@ export class MulesoftService {
     return await response.json();
   }
 
-  getMulesoftPaymentMethod() {
-    return `This action returns all mulesoft`;
+  getMulesoftPaymentMethod(params:any, body:any) {
+    const { xcorrelationid } = params;
+    const url = `${this.baseUrl}/payment-method-qualification-papi-${this.env}/api/v1/paymentMethodQualification`;
+
+    return this.resilienceService.execute(
+      'mule:payment-method',
+      () => this.fetchMulesoftPaymentMethod(params, body, url),
+      {timeoutMs: 7000}
+    );
+  }
+
+  async fetchMulesoftPaymentMethod(params: any, body: any, url: string, signal?: AbortSignal): Promise<any> {
+    const { xcorrelationid } = params;
+
+    const token = await this.authService.getCustomToken('idp:mule:payment-method:token', 'MULESOFT_PAYMENTMETHOD_CLIENT_ID');
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      client_id: this.paymentMethodClientId.split(':')[0],
+      'x-correlation-id': `${xcorrelationid}`,
+      'currentComponent': 'IVR_METPAGO',
+      'sourceComponent': 'Metodo_Pago',
+      'currentApplication': 'IVR_METPAGO',
+      'sourceApplication': 'IVR_METPAGO',
+    };
+    console.log('Headers Payment Method:', headers);
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(body),
+      signal
+    })
+
+    if (!response.ok) {
+      const txt = await response.text();
+      throw new HttpException(txt || 'Upstream error', response.status);
+    }
+
+    return await response.json();
   }
 
   getMulesoftBillingAccountDebt() {
