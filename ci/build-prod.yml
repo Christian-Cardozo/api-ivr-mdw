@@ -7,6 +7,15 @@ build-prod-api-gateway:
     APP_NAME: "api-gateway"
     IMAGE_NAME: "api-gateway"
 
+build-prod-api-internal:
+  extends: .build-template
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "prod"'      
+  variables:
+    IMAGE_TAG: "prod"
+    APP_NAME: "api-internal"
+    IMAGE_NAME: "api-internal"
+
 build-prod-mulesoft-customer-ms:
   extends: .build-template
   rules:

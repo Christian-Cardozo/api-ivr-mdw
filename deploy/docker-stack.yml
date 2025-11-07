@@ -39,12 +39,12 @@ services:
         - "traefik.enable=true"
 
         # HTTP (7000)
-        - "traefik.http.routers.api-gateway-http.rule=${HOST} || Host(`api-ivr1`) || Host(`api-ivr2`)"
+        - "traefik.http.routers.api-gateway-http.rule=(${HOST} || Host(`api-ivr1`) || Host(`api-ivr2`)) && (PathPrefix(`/api/ivr-mdw`) || PathPrefix(`/health`))"
         - "traefik.http.routers.api-gateway-http.entrypoints=web"
         - "traefik.http.routers.api-gateway-http.service=api-gateway"
 
         # HTTPS (7443)
-        - "traefik.http.routers.api-gateway-https.rule=${HOST} || Host(`api-ivr1`) || Host(`api-ivr2`)"
+        - "traefik.http.routers.api-gateway-https.rule=(${HOST} || Host(`api-ivr1`) || Host(`api-ivr2`)) && (PathPrefix(`/api/ivr-mdw`) || PathPrefix(`/health`))"
         - "traefik.http.routers.api-gateway-https.entrypoints=websecure"
         - "traefik.http.routers.api-gateway-https.tls=true"
         - "traefik.http.routers.api-gateway-https.service=api-gateway"
@@ -53,6 +53,53 @@ services:
         - "traefik.swarm.network=traefik-public"
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/health >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  api-internal:
+    image: ${CI_REGISTRY_IMAGE}/api-internal:${IMAGE_TAG}
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      APP_ENV:  ${APP_ENV}      
+      APP_HOST: ${APP_HOST}   
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+      HOST: ${HOST}
+    networks: [ivr-net, traefik-public]    
+    deploy:
+      mode: replicated
+      replicas: ${API_INTERNAL_REPLICAS}
+      restart_policy: { condition: any }
+      resources:
+        limits: { cpus: "0.50", memory: 512M }
+        reservations: { memory: 256M }
+      update_config:
+        parallelism: 1
+        delay: 5s
+        order: start-first
+      labels:
+        - "traefik.enable=true"
+
+        # HTTP (7000)
+        - "traefik.http.routers.api-internal-http.rule=(${HOST} || Host(`api-ivr1`) || Host(`api-ivr2`)) && (PathPrefix(`/api/ivr-int`) || PathPrefix(`/health`))"
+        - "traefik.http.routers.api-internal-http.entrypoints=web"
+        - "traefik.http.routers.api-internal-http.service=api-internal"
+
+        # HTTPS (7443)
+        - "traefik.http.routers.api-internal-https.rule=(${HOST} || Host(`api-ivr1`) || Host(`api-ivr2`)) && (PathPrefix(`/api/ivr-int`) || PathPrefix(`/health`))"
+        - "traefik.http.routers.api-internal-https.entrypoints=websecure"
+        - "traefik.http.routers.api-internal-https.tls=true"
+        - "traefik.http.routers.api-internal-https.service=api-internal"
+          
+        - "traefik.http.services.api-internal.loadbalancer.server.port=3100"
+        - "traefik.swarm.network=traefik-public"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3100/health >/dev/null 2>&1 || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 5
