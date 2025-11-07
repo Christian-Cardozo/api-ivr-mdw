@@ -48,7 +48,7 @@ export class MatrizRuteoService {
 
     private coincideCampo(campoDb: string, valor: string): boolean {
         if (!campoDb) return false;
-        const valores = campoDb.split(',').map(v => v.trim());
+        const valores = campoDb.split('|').map(v => v.trim());
 
         if (valores.includes('*')) {
             //Coincide por *
