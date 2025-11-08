@@ -21,6 +21,7 @@ export class AuthClientService {
 
   private async fetchToken(url: string, userkey: string): Promise<{ token: string; expiresIn: number }> {
     const auth = 'Basic ' + Buffer.from(userkey).toString('base64');
+    console.log({url, userkey, auth});
 
     try {
       const response = await fetch(url, {
@@ -38,7 +39,7 @@ export class AuthClientService {
       const data: IDPResponse = await response.json();
 
       return {
-        token: data.access_token,
+        token: kind == 'id' ? data.id_token : data.access_token,
         expiresIn: data.expires_in || 3600,
       };
     } catch (error) {
