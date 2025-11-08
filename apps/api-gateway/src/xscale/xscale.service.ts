@@ -4,6 +4,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import fetch from 'node-fetch';
 import https from 'https';
+import { AuthTokenConfig } from '@app/auth-client/interfaces/auth-config.interface';
 
 @Injectable()
 export class XscaleService {
@@ -13,12 +14,19 @@ export class XscaleService {
     private readonly tranbUrl: string;
     private readonly outageUrl: string;
     private readonly outageClientId: string;
+    private readonly authTokenConfig: AuthTokenConfig;
 
     constructor(
         private readonly configService: ConfigService,
         private readonly resilienceService: ResilienceService,
         private readonly authService: AuthClientService, // Assume some AuthService is injected here
     ) {
+        this.authTokenConfig = {
+            url: this.configService.get<string>('MULESOFT_AUTH_TOKEN_URL') || '',
+            userkey: this.configService.get<string>('MULESOFT_AUTH_USERKEY') || '',
+            key: 'idp:3scale:token',
+            kind: 'id_token',
+        };
         this.baseUrl = this.configService.get<string>('XSCALE_BASE_URL') || "";
         this.clientId = this.configService.get<string>('XSCALE_CLIENT_ID') || "";
         this.tranbUrl = this.configService.get<string>('XSCALE_TRANB_URL') || "";
@@ -36,7 +44,12 @@ export class XscaleService {
     }
 
     async fetchOutageManagerStatus(url: string, signal?: AbortSignal): Promise<any> {
-        const token = await this.authService.getCustomToken('idp:3scale-outage', undefined, 'XSCALE_OUTAGE_CLIENT_ID');
+        const authConfig: AuthTokenConfig = {
+            url: this.authTokenConfig.url,
+            key: 'idp:3scale-outage:token',
+            userkey: this.outageClientId
+        }
+        const token = await this.authService.getToken(authConfig);
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
@@ -91,7 +104,7 @@ export class XscaleService {
     }
 
     async fetchService(url: string, signal?: AbortSignal): Promise<any> {
-        const token = await this.authService.getCustomToken('idp:3scale', 'id');
+        const token = await this.authService.getToken(this.authTokenConfig);
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
@@ -128,7 +141,7 @@ export class XscaleService {
     }
 
     async fetchPayment(body: any, url: string, signal?: AbortSignal): Promise<any> {
-        const token = await this.authService.getToken();
+        const token = await this.authService.getToken(this.authTokenConfig);
         const headers: Record<string, string> = {
             'Content-Type': 'text/xml',
             Authorization: `Bearer ${token}`,
@@ -206,7 +219,7 @@ export class XscaleService {
     }
 
     async fetchTranB(ani: string, url: string, signal?: AbortSignal): Promise<any> {
-        const token = await this.authService.getCustomToken('idp:3scale', 'id');
+        const token = await this.authService.getToken(this.authTokenConfig);
 
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',

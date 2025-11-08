@@ -6,22 +6,23 @@ import { AuthTokenConfig } from './interfaces/auth-config.interface';
 
 @Injectable()
 export class AuthClientService {
-  private readonly logger = new Logger(AuthClientService.name);  
+  private readonly logger = new Logger(AuthClientService.name);
 
   constructor(
-    private readonly redis: RedisService,    
+    private readonly redis: RedisService,
   ) { }
 
-  async getToken(config: AuthTokenConfig): Promise<string> {    
+  async getToken(config: AuthTokenConfig): Promise<string> {
     if (!config.url || !config.userkey || !config.key) {
       throw new Error('AuthClientService: Missing configuration for token retrieval');
     }
-    return this.redis.getToken(config.key, () => this.fetchToken(config.url, config.userkey));
+    return this.redis.getToken(config.key, () => this.fetchToken(config));
   }
 
-  private async fetchToken(url: string, userkey: string): Promise<{ token: string; expiresIn: number }> {
+  private async fetchToken(config: AuthTokenConfig): Promise<{ token: string; expiresIn: number }> {
+    const { url, userkey, kind } = config;
     const auth = 'Basic ' + Buffer.from(userkey).toString('base64');
-    console.log({url, userkey, auth});
+    console.log({ url, userkey, auth });
 
     try {
       const response = await fetch(url, {
@@ -39,7 +40,7 @@ export class AuthClientService {
       const data: IDPResponse = await response.json();
 
       return {
-        token: kind == 'id' ? data.id_token : data.access_token,
+        token: kind == 'id_token' ? data.id_token : data.access_token,
         expiresIn: data.expires_in || 3600,
       };
     } catch (error) {
@@ -48,7 +49,7 @@ export class AuthClientService {
     }
   }
 
-  async invalidateToken(redisKey:string): Promise<void> {
+  async invalidateToken(redisKey: string): Promise<void> {
     await this.redis.invalidateToken(redisKey);
   }
 }
