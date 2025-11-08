@@ -45,7 +45,7 @@ export class MsSupervisor implements OnModuleInit, OnModuleDestroy {
             await client.connect();
             this.logger.log(`[${name}] TCP conectado`);
         } catch (e: any) {
-            const delay = Math.min(1000 * 2 ** Math.min(attempt, 5), 3000); // backoff c/ tope
+            const delay = Math.min(1000 * 2 ** Math.min(attempt, 5), 10000); // backoff c/ tope
             this.logger.warn(`[${name}] connect() falló: ${e?.code || e?.message}. Reintento en ${delay}ms`);
             setTimeout(() => this.ensureConnected({ name, client }, attempt + 1), delay);
         }

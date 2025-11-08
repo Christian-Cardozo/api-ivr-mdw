@@ -1,4 +1,5 @@
 import { AuthClientService } from '@app/auth-client';
+import { AuthTokenConfig } from '@app/auth-client/interfaces/auth-config.interface';
 import { ResilienceConfig, ResilienceService } from '@app/resilience';
 import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -11,6 +12,7 @@ export class MulesoftDigitalBillingMsService {
   private readonly env: string;
   private readonly clientId: string;
   private readonly ResilienceConfig: ResilienceConfig;
+  private readonly authTokenConfig: AuthTokenConfig;
 
   constructor(
     private readonly authService: AuthClientService,
@@ -20,6 +22,12 @@ export class MulesoftDigitalBillingMsService {
     this.baseUrl = this.configService.get<string>('MULESOFT_BASE_URL') || '';
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
     this.env = this.configService.get<string>('APP_ENV') || '';
+
+    this.authTokenConfig = {
+      url: this.configService.get<string>('MULESOFT_AUTH_TOKEN_URL') || '',
+      userkey: this.configService.get<string>('MULESOFT_AUTH_USERKEY') || '',
+      key: 'idp:mule:token',
+    };
 
     let config: any = {};
     try {
@@ -46,7 +54,7 @@ export class MulesoftDigitalBillingMsService {
   }
 
   private async fetchPayment(params: any, body: any, url: string, signal?: AbortSignal): Promise<string> {
-    const token = await this.authService.getToken();
+    const token = await this.authService.getToken(this.authTokenConfig);
     
     const { xcorrelationid } = params;
 
@@ -99,7 +107,7 @@ export class MulesoftDigitalBillingMsService {
       // 👈 Si es 401, invalidar token (el retry lo maneja ResilienceService)
       if (error instanceof HttpException && error.getStatus() === 401) {
         this.logger.warn('Received 401, invalidating token');
-        await this.authService.invalidateToken();
+        await this.authService.invalidateToken(this.authTokenConfig.key);
       }
 
       throw error;

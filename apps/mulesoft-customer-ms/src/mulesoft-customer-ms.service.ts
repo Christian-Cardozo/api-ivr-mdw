@@ -1,4 +1,5 @@
 import { AuthClientService } from '@app/auth-client';
+import { AuthTokenConfig } from '@app/auth-client/interfaces/auth-config.interface';
 import { ResilienceService, ResilienceConfig } from '@app/resilience';
 import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -10,6 +11,7 @@ export class MulesoftCustomerMsService {
   private readonly env: string;
   private readonly clientId: string;
   private readonly ResilienceConfig: ResilienceConfig;
+  private readonly authTokenConfig: AuthTokenConfig;
 
   private ROUTES_TO_DELETE: string[][] = [
     ['accounts', 'billingAddress'],
@@ -28,6 +30,12 @@ export class MulesoftCustomerMsService {
     this.baseUrl = this.configService.get<string>('MULESOFT_BASE_URL') || '';
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
     this.env = this.configService.get<string>('APP_ENV') || '';
+
+    this.authTokenConfig = {
+      url: this.configService.get<string>('MULESOFT_AUTH_TOKEN_URL') || '',
+      userkey: this.configService.get<string>('MULESOFT_AUTH_USERKEY') || '',
+      key: 'idp:mule:token',
+    };
 
     this.ResilienceConfig = {
       maxRetries: this.configService.get<number>('MULESOFT_CUSTOMER_RETRIES', 2),
@@ -62,7 +70,7 @@ export class MulesoftCustomerMsService {
   }
 
   private async fetchCustomer(url: string, signal?: AbortSignal): Promise<any> {
-    const token = await this.authService.getToken();
+    const token = await this.authService.getToken(this.authTokenConfig);
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -105,7 +113,7 @@ export class MulesoftCustomerMsService {
       // 👈 Si es 401, invalidar token (el retry lo maneja ResilienceService)
       if (error instanceof HttpException && error.getStatus() === 401) {
         this.logger.warn('Received 401, invalidating token');
-        await this.authService.invalidateToken();
+        await this.authService.invalidateToken(this.authTokenConfig.key);
       }
 
       throw error;

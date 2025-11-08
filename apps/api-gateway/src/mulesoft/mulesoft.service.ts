@@ -1,9 +1,10 @@
 import { HttpException, Inject, Injectable, Logger } from '@nestjs/common';
 import { AuthClientService } from '@app/auth-client';
 import { ClientProxy } from '@nestjs/microservices';
-import { catchError, firstValueFrom, Observable, of, timeout } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 import { ResilienceService } from '@app/resilience';
+import { AuthTokenConfig } from '@app/auth-client/interfaces/auth-config.interface';
 
 @Injectable()
 export class MulesoftService {
@@ -14,7 +15,7 @@ export class MulesoftService {
   private readonly paymentMethodClientId: string;
   private readonly baseUrl: string;
   private readonly env: string;
-  private hb?: NodeJS.Timeout;
+  private readonly authTokenConfig: AuthTokenConfig;
 
   constructor(
     private readonly authService: AuthClientService,
@@ -25,6 +26,13 @@ export class MulesoftService {
   ) {
     this.baseUrl = this.configService.get<string>('MULESOFT_BASE_URL') || '';
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
+
+    this.authTokenConfig = {
+      url: this.configService.get<string>('MULESOFT_AUTH_TOKEN_URL') || '',
+      userkey: this.configService.get<string>('MULESOFT_AUTH_USERKEY') || '',
+      key: 'idp:mule:token',
+    };
+
     this.corpoContactClientId = this.configService.get<string>('MULESOFT_CORPOCONTACT_CLIENT_ID') || '';
     this.paymentMethodClientId = this.configService.get<string>('MULESOFT_PAYMENTMETHOD_CLIENT_ID') || '';
     this.env = this.configService.get<string>('APP_ENV') || '';
@@ -54,7 +62,7 @@ export class MulesoftService {
 
   async fetchMulesoftCancellation(params: any, url: string, body: any) {
     const { xcorrelationid } = params;
-    const token = await this.authService.getToken();
+    const token = await this.authService.getToken(this.authTokenConfig);
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -93,7 +101,7 @@ export class MulesoftService {
   }
 
   async fetchCustomerBill(url: string, signal?: AbortSignal): Promise<any> {
-    const token = await this.authService.getToken();
+    const token = await this.authService.getToken(this.authTokenConfig);
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
@@ -114,8 +122,7 @@ export class MulesoftService {
     return await response.json();
   }
 
-  getMulesoftPaymentMethod(params: any, body: any) {
-    const { xcorrelationid } = params;
+  getMulesoftPaymentMethod(params: any, body: any) {    
     const url = `${this.baseUrl}/payment-method-qualification-papi-${this.env}/api/v1/paymentMethodQualification`;
 
     return this.resilienceService.execute(
@@ -128,7 +135,13 @@ export class MulesoftService {
   async fetchMulesoftPaymentMethod(params: any, body: any, url: string, signal?: AbortSignal): Promise<any> {
     const { xcorrelationid } = params;
 
-    const token = await this.authService.getCustomToken('idp:mule:payment-method:token', 'MULESOFT_PAYMENTMETHOD_CLIENT_ID');
+    const authConfig:AuthTokenConfig = {
+      url: this.authTokenConfig.url,
+      key: 'idp:mule:payment-method:token',
+      userkey: this.paymentMethodClientId
+    }
+
+    const token = await this.authService.getToken(authConfig);
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -156,10 +169,6 @@ export class MulesoftService {
     return await response.json();
   }
 
-  getMulesoftBillingAccountBalance() {
-    return `This action returns all mulesoft`;
-  }
-
   async getMulesoftLoansOffering(params: any, body: any) {
     const url = `${this.baseUrl}/salesforce-loans-offering-sapi-${this.env}/api/v1/getAvailableLoans`
 
@@ -170,7 +179,7 @@ export class MulesoftService {
   }
 
   async fetchLoansOffering(params: any, body: any, url: string, signal?: AbortSignal): Promise<any> {
-    const token = await this.authService.getToken();
+    const token = await this.authService.getToken(this.authTokenConfig);
     const { xcorrelationid } = params
 
     const headers: Record<string, string> = {
@@ -210,7 +219,7 @@ export class MulesoftService {
   }
 
   async fetchCbsProductInventory(params: any, url: string, signal?: AbortSignal): Promise<any> {
-    const token = await this.authService.getToken();
+    const token = await this.authService.getToken(this.authTokenConfig);
     const { xcorrelationid, } = params
 
     const headers: Record<string, string> = {
@@ -249,7 +258,14 @@ export class MulesoftService {
   }
 
   async fetchMulesoftContact(url: string, signal?: AbortSignal): Promise<any> {
-    const token = await this.authService.getCustomToken('idp:mule:contact:token', 'MULESOFT_CORPOCONTACT_CLIENT_ID');
+
+    const authConfig:AuthTokenConfig = {
+      url: this.authTokenConfig.url,
+      key: 'idp:mule:contact:token',
+      userkey: this.corpoContactClientId
+    }
+
+    const token = await this.authService.getToken(authConfig);
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -281,7 +297,12 @@ export class MulesoftService {
   }
 
   async fetchYoizen(body: any, url: string, signal?: AbortSignal): Promise<any> {
-    const token = await this.authService.getCustomToken('idp:mule:yoizen:token', 'MULESOFT_CORPOCONTACT_CLIENT_ID');
+    const authConfig:AuthTokenConfig = {
+      url: this.authTokenConfig.url,
+      key: 'idp:mule:yoizen:token',
+      userkey: this.corpoContactClientId
+    }
+    const token = await this.authService.getToken(authConfig);
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -315,7 +336,7 @@ export class MulesoftService {
   }
 
   async fetchAdditionalOrdering(params: any, body: any, url: string, signal?: AbortSignal): Promise<any> {
-    const token = await this.authService.getToken();
+    const token = await this.authService.getToken(this.authTokenConfig);
     const { xcorrelationid } = params
 
     const headers: Record<string, string> = {
@@ -355,7 +376,7 @@ export class MulesoftService {
   }
 
   async fetchMulesoftCustomerManagementCorpo(url: string, signal?: AbortSignal): Promise<any> {
-    const token = await this.authService.getToken();
+    const token = await this.authService.getToken(this.authTokenConfig);
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -386,10 +407,10 @@ export class MulesoftService {
     )
   }
 
-  async fetchMulesoftBillingAccountDebt(params:any, url: string, signal?: AbortSignal): Promise<any> {
-    const token = await this.authService.getToken();
+  async fetchMulesoftBillingAccountDebt(params: any, url: string, signal?: AbortSignal): Promise<any> {
+    const token = await this.authService.getToken(this.authTokenConfig);
     const { xcorrelationid } = params
-    
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
@@ -415,5 +436,8 @@ export class MulesoftService {
     return await response.json();
   }
 
+  getMulesoftBillingAccountBalance() {
+    return `This action returns all mulesoft`;
+  }
 }
 
