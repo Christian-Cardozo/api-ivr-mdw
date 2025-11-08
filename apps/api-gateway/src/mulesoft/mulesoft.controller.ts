@@ -47,13 +47,7 @@ export class MulesoftController {
     @Body() body: any
   ) {
     return this.mulesoftService.getMulesoftPaymentMethod(params, body);
-  }
-
-  @Get('billing-account-debt')
-  @XmlResponse()
-  getMulesoftBillingAccountDebt() {
-    return this.mulesoftService.getMulesoftBillingAccountDebt();
-  }
+  }  
 
   @Get('billing-account-balance')
   @XmlResponse()
@@ -116,9 +110,12 @@ export class MulesoftController {
     return this.mulesoftService.getMulesoftCustomerManagementCorpo(cuit);
   }
 
-    @Get('debt-collection/:accountIntegrationId')
+  @Get('billing-account-debt/:accountIntegrationId')
   @XmlResponse()
-  getMulesoftMora(@Param() { accountIntegrationId }: any) {
-    return this.mulesoftService.getMulesoftMora(accountIntegrationId);
+  getMulesoftBillingAccountDebt(
+    @Param() { accountIntegrationId }: any,
+    @Query() params: any
+  ) {
+    return this.mulesoftService.getMulesoftBillingAccountDebt(accountIntegrationId, params);
   }
 }

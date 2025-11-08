@@ -38,7 +38,7 @@ export class MulesoftService {
     return this.mulesoftCustomerClient.send<string, { type: string, dni: string }>('get-by-dni', { type, dni })
   }
 
-  getMulesoftDigitalBilling(params: any, body: any): Observable<string> {    
+  getMulesoftDigitalBilling(params: any, body: any): Observable<string> {
     return this.mulesoftDigitalBillingClient.send<string, any>('digital-billing', { params, body })
   }
 
@@ -114,14 +114,14 @@ export class MulesoftService {
     return await response.json();
   }
 
-  getMulesoftPaymentMethod(params:any, body:any) {
+  getMulesoftPaymentMethod(params: any, body: any) {
     const { xcorrelationid } = params;
     const url = `${this.baseUrl}/payment-method-qualification-papi-${this.env}/api/v1/paymentMethodQualification`;
 
     return this.resilienceService.execute(
       'mule:payment-method',
       () => this.fetchMulesoftPaymentMethod(params, body, url),
-      {timeoutMs: 7000}
+      { timeoutMs: 7000 }
     );
   }
 
@@ -154,10 +154,6 @@ export class MulesoftService {
     }
 
     return await response.json();
-  }
-
-  getMulesoftBillingAccountDebt() {
-    return `This action returns all mulesoft`;
   }
 
   getMulesoftBillingAccountBalance() {
@@ -348,7 +344,7 @@ export class MulesoftService {
     return await response.json();
   }
 
-   async getMulesoftCustomerManagementCorpo(cuit: string) {
+  async getMulesoftCustomerManagementCorpo(cuit: string) {
 
     const url = `${this.baseUrl}/customer-mngmt-papi-${this.env}/api/v1/customer?filtering=identificationId=${cuit}`
 
@@ -380,21 +376,21 @@ export class MulesoftService {
 
     return await response.json();
   }
- //Mule Mora
 
-   async getMulesoftMora(accountIntegrationId: string) {
+  async getMulesoftBillingAccountDebt(params: any, accountIntegrationId: string) {
 
     const url = `${this.baseUrl}/billing-account-mngmt-process-papi-${this.env}/v2/debtCollection?accountIntegrationId=${accountIntegrationId}`
     return this.resilienceService.execute(
       'mule:mora',
-      (signal) => this.fetchMulesoftMora(url, signal),
+      (signal) => this.fetchMulesoftBillingAccountDebt(params, url, signal),
     )
   }
 
-  async fetchMulesoftMora(url: string, signal?: AbortSignal): Promise<any> {
+  async fetchMulesoftBillingAccountDebt(params:any, url: string, signal?: AbortSignal): Promise<any> {
     const token = await this.authService.getToken();
-
-     const headers: Record<string, string> = {
+    const { xcorrelationid } = params
+    
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
       client_id: this.clientId,
