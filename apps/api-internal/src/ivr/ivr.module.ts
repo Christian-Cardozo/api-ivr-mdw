@@ -5,7 +5,7 @@ import { CalendarioServicio } from '../entities/calendario-servicio.entity';
 import { IvrService } from './ivr.service';
 import { IvrController } from './ivr.controller';
 import { MatrizRuteoService } from './matriz-ruteo/matriz-ruteo.service';
-import { DiscamatrizService } from './discamatriz/discamatriz.service';
+import { DiscaMatrizService } from './discamatriz/discamatriz.service';
 import { EscenariosService } from './escenarios/escenarios.service';
 import { FlagsService } from './flags/flags.service';
 import { PicPrioService } from './pic-prio/pic-prio.service';
@@ -19,14 +19,24 @@ import { PipuFiService } from './pipu-fi/pipu-fi.service';
 import { SocketService } from './socket/socket.service';
 import { StatusService } from './status/status.service';
 import { CalendarioService } from './calendario/calendario.service';
+import { MrProdXml } from '../entities/mr-prod-xml.entity';
+import { IvrtoolsEscenarios } from '../entities/ivrtools-escenarios.entity';
+import { IvrflagsRegionActual } from '../entities/ivrflags-region-actual';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([IvrappsMatrizRuteo, CalendarioServicio])],
+  imports: [
+    TypeOrmModule.forFeature([
+      IvrappsMatrizRuteo, 
+      CalendarioServicio,
+      MrProdXml,
+      IvrtoolsEscenarios,
+      IvrflagsRegionActual,
+    ])],
   controllers: [IvrController],
   providers: [
     IvrService, 
     MatrizRuteoService,
-    DiscamatrizService,
+    DiscaMatrizService,
     EscenariosService,
     FlagsService,
     PicPrioService,
