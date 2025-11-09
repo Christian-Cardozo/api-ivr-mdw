@@ -6,12 +6,9 @@ import { HttpException, Injectable } from '@nestjs/common';
 @Injectable()
 export class CustomerCareService {
 
-    private readonly baseUrl: string;
-    private readonly clientId: string;
-    private readonly authTokenConfig: AuthTokenConfig;
+    private readonly baseUrl: string;    
 
-    constructor(
-        private readonly authService: AuthClientService,
+    constructor(        
         private readonly resilienceService: ResilienceService,
     ) { }
 
@@ -26,11 +23,9 @@ export class CustomerCareService {
 
     }
 
-    async fetchServiceAdapter(body: any, url: string, signal?: AbortSignal) {
-        //const token = await this.authService.getToken(this.authTokenConfig);
+    async fetchServiceAdapter(body: any, url: string, signal?: AbortSignal) {        
         const headers: Record<string, string> = {
-            'Content-Type': 'application/json',
-            //Authorization: `Bearer ${token}`,            
+            'Content-Type': 'application/json',            
         };
 
         const response = await fetch(url, {
@@ -122,8 +117,7 @@ export class CustomerCareService {
 
     async fetchService(url: string, signal?: AbortSignal) {
         const headers: Record<string, string> = {
-            'Content-Type': 'application/json',
-            //Authorization: `Bearer ${token}`,            
+            'Content-Type': 'application/json',                        
         };
 
         const response = await fetch(url, {
