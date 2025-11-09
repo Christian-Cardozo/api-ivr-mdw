@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ApiInternalController } from './api-internal.controller';
 import { ApiInternalService } from './api-internal.service';
-import { MatrizRuteoModule } from './matriz-ruteo/matriz-ruteo.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HealthModule } from './health/health.module';
+import { IvrModule } from './ivr/ivr.module';
 
 @Module({
   imports: [
@@ -21,9 +21,9 @@ import { HealthModule } from './health/health.module';
         autoLoadEntities: true,
         synchronize: false,
       }),
-    }),
-    MatrizRuteoModule,
-    HealthModule],
+    }),    
+    HealthModule,
+    IvrModule],
   controllers: [ApiInternalController],
   providers: [ApiInternalService],
 })

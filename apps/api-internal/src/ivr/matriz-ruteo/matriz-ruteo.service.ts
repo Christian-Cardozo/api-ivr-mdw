@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { IvrappsMatrizRuteo } from '../entities/ivrapps-matriz-ruteo.entity';
-import { CalendarioServicio } from '../entities/calendario-servicio.entity';
 import { parseStringPromise } from 'xml2js';
+import { IvrappsMatrizRuteo } from '../../entities/ivrapps-matriz-ruteo.entity';
+import { CalendarioServicio } from '../../entities/calendario-servicio.entity';
 
 @Injectable()
 export class MatrizRuteoService {
