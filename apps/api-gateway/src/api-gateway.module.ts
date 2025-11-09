@@ -7,9 +7,11 @@ import { XscaleModule } from './xscale/xscale.module';
 import { CustomerCareModule } from './customer-care/customer-care.module';
 import { IceModule } from './ice/ice.module';
 import { MartechModule } from './martech/martech.module';
+import { SalesforceModule } from './salesforce/salesforce.module';
+import { SalesforceModule } from './salesforce/salesforce.module';
 
 @Module({
-  imports: [MulesoftModule, HealthModule, XscaleModule, CustomerCareModule, IceModule, MartechModule],
+  imports: [MulesoftModule, HealthModule, XscaleModule, CustomerCareModule, IceModule, MartechModule, SalesforceModule],
   controllers: [ApiGatewayController],
   providers: [ApiGatewayService],
 })
