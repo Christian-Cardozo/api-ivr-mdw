@@ -19,14 +19,15 @@ export class XscaleService {
     constructor(
         private readonly configService: ConfigService,
         private readonly resilienceService: ResilienceService,
-        private readonly authService: AuthClientService, // Assume some AuthService is injected here
+        private readonly authService: AuthClientService,
     ) {
         this.authTokenConfig = {
-            url: this.configService.get<string>('MULESOFT_AUTH_TOKEN_URL') || '',
-            userkey: this.configService.get<string>('MULESOFT_AUTH_USERKEY') || '',
+            url: this.configService.get<string>('XSCALE_AUTH_TOKEN_URL') || '',
+            userkey: this.configService.get<string>('XSCALE_AUTH_USERKEY') || '',
             key: 'idp:3scale:token',
             kind: 'id_token',
         };
+
         this.baseUrl = this.configService.get<string>('XSCALE_BASE_URL') || "";
         this.clientId = this.configService.get<string>('XSCALE_CLIENT_ID') || "";
         this.tranbUrl = this.configService.get<string>('XSCALE_TRANB_URL') || "";
@@ -45,7 +46,7 @@ export class XscaleService {
 
     async fetchOutageManagerStatus(url: string, signal?: AbortSignal): Promise<any> {
         const authConfig: AuthTokenConfig = {
-            url: this.authTokenConfig.url,
+            url: this.outageUrl,
             key: 'idp:3scale-outage:token',
             userkey: this.outageClientId
         }
