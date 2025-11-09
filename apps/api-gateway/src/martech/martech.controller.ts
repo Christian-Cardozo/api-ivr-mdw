@@ -7,14 +7,14 @@ import { XmlResponse } from '@app/xml/xml-response.decorator';
 export class MartechController {
   constructor(private readonly martechService: MartechService) { }
 
-  @Post()
+  @Post('ofertas')
   getOfertasMartech(
     @Body() body: any
   ) {
     return this.martechService.getOfertasMartech(body)
   }
 
-  @Post()
+  @Post('eventos')
   getEventosMartech(
     @Body() body: any
   ) {
