@@ -8,13 +8,14 @@ import { CustomerCareModule } from './customer-care/customer-care.module';
 import { IceModule } from './ice/ice.module';
 import { MartechModule } from './martech/martech.module';
 import { SalesforceModule } from './salesforce/salesforce.module';
+import { ResponsysModule } from './responsys/responsys.module';
 import { AmazonModule } from './amazon/amazon.module';
 import { SolconModule } from './solcon/solcon.module';
 import { QualtricsModule } from './qualtrics/qualtrics.module';
 import { SalesforceModule } from './salesforce/salesforce.module';
 
 @Module({
-  imports: [MulesoftModule, HealthModule, XscaleModule, CustomerCareModule, IceModule, MartechModule, SalesforceModule, QualtricsModule, SolconModule, AmazonModule],
+  imports: [MulesoftModule, HealthModule, XscaleModule, CustomerCareModule, IceModule, MartechModule, SalesforceModule, QualtricsModule, SolconModule, AmazonModule, ResponsysModule],
   controllers: [ApiGatewayController],
   providers: [ApiGatewayService],
 })
