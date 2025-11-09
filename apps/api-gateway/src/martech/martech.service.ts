@@ -3,29 +3,40 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class IceService {
+export class MartechService {
 
     private readonly baseUrl: string;
+    private readonly authKey: string;
 
     constructor(
         private readonly resilienceService: ResilienceService,
-        private readonly configService: ConfigService
+        private readonly configService: ConfigService,
     ) {
-        this.baseUrl = this.configService.get<string>('ICE_BASE_URL') || '';
-    }
+        this.baseUrl = this.configService.get<string>("MARTECH_BASE_URL") || "";
+     }
 
-    getCobros(body: any) {
-        const url = `${this.baseUrl}/cobros`;
+    async getOfertasMartech(body: any) {
+        const url = `${this.baseUrl}`;
 
         return this.resilienceService.execute(
-            `ice:cobros`,
-            (signal) => this.fetchCobros(body, url, signal),
+            `martech:ofertas`,
+            (signal) => this.fetchService(body, url, signal),
         )
     }
 
-    async fetchCobros(body: any, url: string, signal?: AbortSignal) {
+    async getEventosMartech(body: any) {
+        const url = `${this.baseUrl}`;
+
+        return this.resilienceService.execute(
+            `martech:eventos`,
+            (signal) => this.fetchService(body, url, signal),
+        )
+    }
+
+    async fetchService(body: any, url: string, signal?: AbortSignal) {
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
+            Authorization: `Basic ${this.authKey}`
         };
 
         const response = await fetch(url, {

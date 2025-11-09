@@ -6,9 +6,10 @@ import { HealthModule } from './health/health.module';
 import { XscaleModule } from './xscale/xscale.module';
 import { CustomerCareModule } from './customer-care/customer-care.module';
 import { IceModule } from './ice/ice.module';
+import { MartechModule } from './martech/martech.module';
 
 @Module({
-  imports: [MulesoftModule, HealthModule, XscaleModule, CustomerCareModule, IceModule],
+  imports: [MulesoftModule, HealthModule, XscaleModule, CustomerCareModule, IceModule, MartechModule],
   controllers: [ApiGatewayController],
   providers: [ApiGatewayService],
 })
