@@ -13,6 +13,7 @@ export class MartechService {
         private readonly configService: ConfigService,
     ) {
         this.baseUrl = this.configService.get<string>("MARTECH_BASE_URL") || "";
+        this.authKey = this.configService.get<string>("MARTECH_AUTH_KEY") || "";
      }
 
     async getOfertasMartech(body: any) {

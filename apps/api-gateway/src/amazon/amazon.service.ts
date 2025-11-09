@@ -17,10 +17,10 @@ export class AmazonService {
     }
 
     async sendWhatsApp(body: any) {
-        const url = `${this.baseUrl}/context-store/create-context`;
+        const url = `${this.baseUrl}`;
 
         return this.resilienceService.execute(
-            `amazon:context-store`,
+            `amazon:wa`,
             (signal) => this.fetchService(body, url, signal),
         )
     }
