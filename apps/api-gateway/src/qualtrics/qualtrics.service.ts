@@ -39,7 +39,7 @@ export class QualtricsService {
         const url = `${this.baseUrl}${this.listUrl[key]}`;
 
         return this.resilienceService.execute(
-            `qualtrics:key`,
+            `qualtrics:${key}`,
             (signal) => this.fetchService(body, url, signal),
         )
     }
