@@ -18,10 +18,12 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }));
   
   // Puerto y host desde env/config
-  const port = configService.get<number>('APP_PORT', 3000);
-  const host = configService.get<string>('APP_HOST', '0.0.0.0');
+  const host = '0.0.0.0';
+  const port = 3000;
 
   app.useGlobalInterceptors(new RpcToHttpInterceptor());
+  app.enableShutdownHooks();
+  
   await app.listen(port, host);
   logger.log(`🚀 Application running on http://${host}:${port}/api/ivr-mdw`);
 }

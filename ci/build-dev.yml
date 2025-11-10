@@ -1,0 +1,35 @@
+build-dev-api-gateway:
+  extends: .build-template
+  rules:    
+    - if: '$CI_COMMIT_BRANCH == "dev"'         
+  variables:
+    IMAGE_TAG: "dev"
+    APP_NAME: "api-gateway"
+    IMAGE_NAME: "api-gateway"
+
+build-dev-api-internal:
+  extends: .build-template
+  rules:    
+    - if: '$CI_COMMIT_BRANCH == "dev"'         
+  variables:
+    IMAGE_TAG: "dev"
+    APP_NAME: "api-internal"
+    IMAGE_NAME: "api-internal"
+
+build-dev-mulesoft-customer-ms:
+  extends: .build-template
+  rules:    
+    - if: '$CI_COMMIT_BRANCH == "dev"'       
+  variables:
+    IMAGE_TAG: "dev"
+    APP_NAME: "mulesoft-customer-ms"
+    IMAGE_NAME: "mulesoft-customer-ms"
+
+build-dev-mulesoft-digital-billing-ms:
+  extends: .build-template
+  rules:    
+    - if: '$CI_COMMIT_BRANCH == "dev"'          
+  variables:
+    IMAGE_TAG: "dev"
+    APP_NAME: "mulesoft-digital-billing-ms"
+    IMAGE_NAME: "mulesoft-digital-billing-ms"

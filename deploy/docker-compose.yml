@@ -1,6 +1,6 @@
 services:
   api-gateway:
-    image: api-ivr-mdw/api-gateway:latest
+    image: api-gateway:latest
     build:
       context: ..
       dockerfile: ./Dockerfile
@@ -15,8 +15,21 @@ services:
       - mulesoft-customer-ms
       - redis
 
+  api-internal:
+    image: api-internal:latest
+    build:
+      context: ..
+      dockerfile: ./Dockerfile
+      args: { APP_NAME: api-internal }
+    env_file:
+      - ./.env
+    environment:
+      APP_ENV: prod
+    ports:
+      - "8081:3100"
+    
   mulesoft-customer-ms:
-    image: api-ivr-mdw/mulesoft-customer-ms:latest
+    image: mulesoft-customer-ms:latest
     build:
       context: ..
       dockerfile: ./Dockerfile
@@ -28,6 +41,19 @@ services:
     depends_on:
       - redis
 
+  mulesoft-digital-billing-ms:
+    image: mulesoft-digital-billing-ms:latest
+    build:
+      context: ..
+      dockerfile: ./Dockerfile
+      args: { APP_NAME: mulesoft-digital-billing-ms }
+    env_file:
+      - ./.env
+    environment:
+      APP_ENV: prod
+    depends_on:
+      - redis
+      
   redis:
     image: redis:7-alpine
     ports:

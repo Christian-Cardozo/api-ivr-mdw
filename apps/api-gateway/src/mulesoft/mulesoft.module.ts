@@ -6,28 +6,49 @@ import { AuthClientModule } from '@app/auth-client';
 
 import { MulesoftController } from './mulesoft.controller';
 import { MulesoftService } from './mulesoft.service';
+import { ResilienceModule } from '@app/resilience';
+import { MsSupervisor } from './ms-supervisor.provider';
 
 @Module({
   imports: [
     AuthClientModule,
+    ResilienceModule,
     ClientsModule.registerAsync([
       {
         name: 'MULESOFT_CUSTOMER_MS',
-        imports: [GlobalConfigModule],        // <- necesario para el factory
+        imports: [GlobalConfigModule],
         inject: [ConfigService],
         useFactory: async (config: ConfigService) => ({
           transport: Transport.TCP,
           options: {
             host: config.get<string>('MULESOFT_CUSTOMER_MS_HOST', 'localhost'),
-            port: config.get<number>('MULESOFT_CUSTOMER_MS_PORT', 3001),
+            port: 3001,
             retryAttempts: 10,
             retryDelay: 3000,
+            timeout: 60000,
           },
         }),
+
+      },
+      {
+        name: 'MULESOFT_DIGITAL_BILLING_MS',
+        imports: [GlobalConfigModule],
+        inject: [ConfigService],
+        useFactory: async (config: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: config.get<string>('MULESOFT_DIGITAL_BILLING_MS_HOST', 'localhost'),
+            port: 3002,
+            retryAttempts: 10,
+            retryDelay: 3000,
+            timeout: 60000,
+          },
+        }),
+
       },
     ]),
   ],
   controllers: [MulesoftController],
-  providers: [MulesoftService],
+  providers: [MulesoftService, MsSupervisor],
 })
-export class MulesoftModule {}
+export class MulesoftModule { }

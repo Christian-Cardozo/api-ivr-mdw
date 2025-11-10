@@ -18,8 +18,8 @@ export class HealthController {
     private healthService: HealthCheckService,
     private msHealth: MicroserviceHealthIndicator,
     private memory: MemoryHealthIndicator,
-    private configService:ConfigService,
-    private redisIoHealth:RedisIoHealth,
+    private configService: ConfigService,
+    private redisIoHealth: RedisIoHealth,
   ) { }
 
   @Get()
@@ -30,10 +30,18 @@ export class HealthController {
       async () =>
         this.msHealth.pingCheck<TcpClientOptions>('mulesoft-customer-ms', {
           transport: Transport.TCP,
-          options: { 
-            host: this.configService.get<string>('MULESOFT_CUSTOMER_MS_HOST') || 'localhost', 
-            port: this.configService.get<number>('MULESOFT_CUSTOMER_MS_PORT') || 3001 , 
-          },          
+          options: {
+            host: this.configService.get<string>('MULESOFT_CUSTOMER_MS_HOST') || 'localhost',
+            port: 3001,
+          },
+        }),
+      async () =>
+        this.msHealth.pingCheck<TcpClientOptions>('mulesoft-digital-billing-ms', {
+          transport: Transport.TCP,
+          options: {
+            host: this.configService.get<string>('MULESOFT_DIGITAL_BILLING_MS_HOST') || 'localhost',
+            port: 3002,
+          },
         }),
       async () => this.redisIoHealth.isHealthy('redis'),
       async () => this.memory.checkHeap('memory_heap', 200 * 1024 * 1024),

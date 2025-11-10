@@ -1,4 +1,5 @@
 import { AuthClientService } from '@app/auth-client';
+import { AuthTokenConfig } from '@app/auth-client/interfaces/auth-config.interface';
 import { ResilienceService, ResilienceConfig } from '@app/resilience';
 import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -7,8 +8,10 @@ import { ConfigService } from '@nestjs/config';
 export class MulesoftCustomerMsService {
   private readonly logger = new Logger(MulesoftCustomerMsService.name);
   private readonly baseUrl: string;
+  private readonly env: string;
   private readonly clientId: string;
   private readonly ResilienceConfig: ResilienceConfig;
+  private readonly authTokenConfig: AuthTokenConfig;
 
   private ROUTES_TO_DELETE: string[][] = [
     ['accounts', 'billingAddress'],
@@ -21,11 +24,18 @@ export class MulesoftCustomerMsService {
 
   constructor(
     private readonly authService: AuthClientService,
-    private readonly resilience: ResilienceService, // 👈 Inyectar ResilienceService
+    private readonly resilienceService: ResilienceService,
     private readonly configService: ConfigService,
   ) {
-    this.baseUrl = this.configService.get<string>('MULESOFT_CUSTOMER_BASE_URL') || '';
+    this.baseUrl = this.configService.get<string>('MULESOFT_BASE_URL') || '';
     this.clientId = this.configService.get<string>('MULESOFT_CLIENT_ID') || '';
+    this.env = this.configService.get<string>('APP_ENV') || '';
+
+    this.authTokenConfig = {
+      url: this.configService.get<string>('MULESOFT_AUTH_TOKEN_URL') || '',
+      userkey: this.configService.get<string>('MULESOFT_AUTH_USERKEY') || '',
+      key: 'idp:mule:token',
+    };
 
     this.ResilienceConfig = {
       maxRetries: this.configService.get<number>('MULESOFT_CUSTOMER_RETRIES', 2),
@@ -36,12 +46,11 @@ export class MulesoftCustomerMsService {
     };
   }
 
-
   //@Retry('mule:getByANI')
-  async getByANI(ani: string, signal?: AbortSignal) {
-    const url = `${this.baseUrl}/api/v1/customer?excludeNulls=true&deepLevel=3&mobileNumber=${ani}`;
+  async getByANI(ani: string) {
+    const url = `${this.baseUrl}/customer-mngmt-proc-api-${this.env}/api/v1/customer?excludeNulls=true&deepLevel=3&mobileNumber=${ani}`;
 
-    return this.resilience.execute(
+    return this.resilienceService.execute(
       'mule:getByANI',
       (signal) => this.fetchCustomer(url, signal),
       this.ResilienceConfig,
@@ -49,11 +58,11 @@ export class MulesoftCustomerMsService {
   }
 
   //@Resilience('mule:getByDNI')
-  async getByDNI(dni: string) {
-    const url = `${this.baseUrl}/api/v1/customer?excludeNulls=true&deepLevel=3&documentType=DNI&documentNumber=${dni}`;
+  async getByDNI(type: string, dni: string) {
+    const url = `${this.baseUrl}/customer-mngmt-proc-api-${this.env}/api/v1/customer?excludeNulls=true&deepLevel=3&documentType=${type}&documentNumber=${dni}`;
 
     //console.log(this.ResilienceConfig)    
-    return this.resilience.execute(
+    return this.resilienceService.execute(
       'mule:getByDNI',
       (signal) => this.fetchCustomer(url, signal),
       this.ResilienceConfig,
@@ -61,7 +70,7 @@ export class MulesoftCustomerMsService {
   }
 
   private async fetchCustomer(url: string, signal?: AbortSignal): Promise<any> {
-    const token = await this.authService.getToken();
+    const token = await this.authService.getToken(this.authTokenConfig);
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -90,12 +99,7 @@ export class MulesoftCustomerMsService {
       }
 
       const body = await response.json();
-
-      // 🧹 limpiar campos como en PHP
       const pruned = this.prunePathsInPlace(body, this.ROUTES_TO_DELETE);
-
-      // Si querés emular EXACTO el PHP, devolvé string:
-      // return JSON.stringify(pruned, undefined, 2);
       //return pruned;
       return body;
 
@@ -109,13 +113,12 @@ export class MulesoftCustomerMsService {
       // 👈 Si es 401, invalidar token (el retry lo maneja ResilienceService)
       if (error instanceof HttpException && error.getStatus() === 401) {
         this.logger.warn('Received 401, invalidating token');
-        await this.authService.invalidateToken();
+        await this.authService.invalidateToken(this.authTokenConfig.key);
       }
 
       throw error;
     }
   }
-
 
   private shouldRetry(error: any): boolean {
     // Si es un HttpException de NestJS
@@ -176,11 +179,11 @@ export class MulesoftCustomerMsService {
   }
 
   private prunePathsInPlace(root: any, paths: string[][]): void {
-  if (Array.isArray(root)) {
-    for (const item of root) for (const p of paths) this.deletePath(item, p);
-  } else if (root && typeof root === 'object') {
-    for (const p of paths) this.deletePath(root, p);
+    if (Array.isArray(root)) {
+      for (const item of root) for (const p of paths) this.deletePath(item, p);
+    } else if (root && typeof root === 'object') {
+      for (const p of paths) this.deletePath(root, p);
+    }
   }
-}
 
 }

@@ -26,9 +26,9 @@ export class CircuitBreakerService {
     const breaker = await this.getBreakerState(key);
 
     const breakerConfig = {
-      failureThreshold: 3,
+      failureThreshold: 5,
       resetTimeoutMs: 15000,
-      successThreshold: 1,
+      successThreshold: 3,
       ...config,
     }
 

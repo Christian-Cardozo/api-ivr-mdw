@@ -1,0 +1,9 @@
+{
+  "name": "api-internal",
+  "private": true,
+  "scripts": {
+    "build": "nest build api-internal",
+    "start:prod": "node dist/apps/api-internal/main.js",
+    "start:dev": "nest start api-internal --watch"
+  }
+}

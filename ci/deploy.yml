@@ -1,0 +1,43 @@
+deploy-dev:
+  extends: .deploy-template
+  tags: [ ivr-dev-01 ]
+  rules: [ { if: '$CI_COMMIT_BRANCH == "dev"' } ]
+  environment: { name: development }
+  variables:
+    ENV_NAME: "development"
+    STACK_NAME: "ivr-stack-dev"
+    IMAGE_TAG: "dev"
+    HOST: "Host(`dev-gestionivr.slz.corp.cloudteco.com.ar`) || Host(`dlsnewevomdb001`)"
+
+deploy-preprod:
+  extends: .deploy-template
+  tags: [ ivr-preprod-01 ]
+  rules: [ { if: '$CI_COMMIT_BRANCH == "preprod"' } ]
+  environment: { name: preproduction }
+  variables:
+    ENV_NAME: "preproduction"
+    STACK_NAME: "ivr-stack-preprod"
+    IMAGE_TAG: "preprod"
+    HOST: "Host(`prepro-gestionivr.slz.corp.cloudteco.com.ar`) || Host(`plsnewevoapp001`)"
+
+deploy-slz:
+  extends: .deploy-template
+  tags: [ ivr-prod-slz ]
+  rules: [ { if: '$CI_COMMIT_BRANCH == "prod"' } ]
+  environment: { name: production }
+  variables:
+    ENV_NAME: "production"
+    STACK_NAME: "ivr-stack-slz"
+    IMAGE_TAG: "prod"
+    HOST: "Host(`gestionivr.slz.corp.cloudteco.com.ar`) || Host(`plsnewevomdb002`)"
+
+deploy-hor:
+  extends: .deploy-template
+  tags: [ ivr-prod-hor ]
+  rules: [ { if: '$CI_COMMIT_BRANCH == "prod"' } ]
+  environment: { name: production }
+  variables:
+    ENV_NAME: "production"
+    STACK_NAME: "ivr-stack-hor"
+    IMAGE_TAG: "prod"
+    HOST: "Host(`gestionivr.hor.corp.cloudteco.com.ar`) || Host(`plhnewevomdb002`)"

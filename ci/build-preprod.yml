@@ -1,0 +1,35 @@
+build-preprod-api-gateway:
+  extends: .build-template
+  rules:    
+    - if: '$CI_COMMIT_BRANCH == "preprod"'      
+  variables:
+    IMAGE_TAG: "preprod"
+    APP_NAME: "api-gateway"
+    IMAGE_NAME: "api-gateway"
+
+build-preprod-api-internal:
+  extends: .build-template
+  rules:    
+    - if: '$CI_COMMIT_BRANCH == "preprod"'      
+  variables:
+    IMAGE_TAG: "preprod"
+    APP_NAME: "api-internal"
+    IMAGE_NAME: "api-internal"
+
+build-preprod-mulesoft-customer-ms:
+  extends: .build-template
+  rules:    
+    - if: '$CI_COMMIT_BRANCH == "preprod"'      
+  variables:
+    IMAGE_TAG: "preprod"
+    APP_NAME: "mulesoft-customer-ms"
+    IMAGE_NAME: "mulesoft-customer-ms"
+
+build-preprod-mulesoft-digital-billing-ms:
+  extends: .build-template
+  rules:  
+    - if: '$CI_COMMIT_BRANCH == "preprod"'      
+  variables:
+    IMAGE_TAG: "preprod"
+    APP_NAME: "mulesoft-digital-billing-ms"
+    IMAGE_NAME: "mulesoft-digital-billing-ms"
